@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/*",
-                "${workspaceFolder}/thirdparty/glad/include"
+                "${workspaceFolder}/thirdparty/glad/include",
+                "${workspaceFolder}/thirdparty/stb_image"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
