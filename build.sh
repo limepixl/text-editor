@@ -5,4 +5,5 @@ clang -O2 -Wall -Wextra -c thirdparty/glad/src/glad.c -I thirdparty/glad/include
 conf=$(sdl2-config --cflags --libs)
 tp_includes='-I thirdparty/glad/include -I thirdparty/stb_image'
 tp_libs='-ldl'
-clang++ -O2 -Wall -Wextra src/*.cpp glad.o stb_image.o -o editor $conf $tp_includes $tp_libs
+source='src/*.cpp src/window/*.cpp src/shader/*.cpp src/texture/*.cpp src/asset_load/*.cpp'
+clang++ -O2 -Wall -Wextra $source glad.o stb_image.o -o editor $conf $tp_includes $tp_libs
