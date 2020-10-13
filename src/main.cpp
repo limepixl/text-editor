@@ -1,5 +1,6 @@
-#include <glad/glad.h>
+#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
+#include <glad/glad.h>
 #include <cstdio>
 #include "window/window.hpp"
 #include "asset_load/asset_load.hpp"
@@ -8,6 +9,8 @@ unsigned int Texture::NumTexturesLoaded = 0;
 
 int main()
 {
+	SDL_SetMainReady();
+
 	Display display("Text Editor", 640, 480);
 
 	float vertices[]
