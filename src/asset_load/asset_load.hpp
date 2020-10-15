@@ -2,5 +2,5 @@
 #include "../texture/texture.hpp"
 #include "../shader/shader.hpp"
 
-Texture LoadTextureFromFile(const char* path);
+Texture LoadTextureFromBinary(const char* path);
 Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath);

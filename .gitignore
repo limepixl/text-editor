@@ -3,3 +3,6 @@ editor
 *.swp
 *.png
 *.exe
+*.ilk
+*.pdb
+*.bin

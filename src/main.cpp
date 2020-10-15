@@ -50,7 +50,7 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
-	Texture atlas = LoadTextureFromFile("res/font/roboto.png");
+	Texture atlas = LoadTextureFromBinary("res/font/roboto.bin");
 
 	Shader shader = LoadShaderFromFile("res/shader/basic.vert", "res/shader/basic.frag");
 	glUseProgram(shader.ID);
