@@ -1,6 +1,6 @@
 @echo off
 
-set "cppflags=-O2 -Wall -Wextra -fno-exceptions -D_CRT_SECURE_NO_WARNINGS"
+set "cppflags=-O2 -Wall -Wextra -D_CRT_SECURE_NO_WARNINGS"
 set "tp_includes=-I ./thirdparty/glad/include -I ./thirdparty/SDL2/include"
 
 clang %cppflags% -c thirdparty/glad/src/glad.c -I thirdparty/glad/include

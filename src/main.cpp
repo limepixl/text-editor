@@ -11,26 +11,19 @@ int main()
 {
 	SDL_SetMainReady();
 
-	Display display("Text Editor", 640, 480);
+	Display display("Text Editor", 500, 500);
+
+	std::vector<Char> chars = ParseFNT("res/font/roboto-mono.fnt");
+	Char& currentChar = chars['a' - chars[0].c];
 
 	float vertices[]
 	{
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-		-1.0f, 1.0f, 0.0f,
-		-1.0f, -1.0f, 0.0f
-	};
-
-	float uvs[]
-	{
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 0.0f
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f,
+		-0.5f, 0.5f, 0.0f,
+		-0.5f, -0.5f, 0.0f
 	};
 
 	GLuint VAO;
@@ -46,11 +39,11 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), uvs, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, (int)currentChar.uvs.size() * sizeof(float), currentChar.uvs.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
-	Texture atlas = LoadTextureFromBinary("res/font/roboto.bin");
+	Texture atlas = LoadTextureFromBinary("res/font/roboto-mono.bin");
 
 	Shader shader = LoadShaderFromFile("res/shader/basic.vert", "res/shader/basic.frag");
 	glUseProgram(shader.ID);

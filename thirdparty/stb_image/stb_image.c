@@ -19,11 +19,11 @@ int main()
     stbi_set_flip_vertically_on_load(1);
 
     int w, h, c;
-    unsigned char* data = stbi_load("res/font/roboto.png", &w, &h, &c, 0);
+    unsigned char* data = stbi_load("res/font/roboto-mono_0.png", &w, &h, &c, 0);
     if(data == NULL)
         printf("Failed to load data!\n");
     
-    FILE* outfile = fopen("res/font/roboto.bin", "wb");
+    FILE* outfile = fopen("res/font/roboto-mono.bin", "wb");
 
     fprintf(outfile, "%d %d %d\n", w, h, c);
     fwrite(data, sizeof(unsigned char), w * h * c, outfile);
