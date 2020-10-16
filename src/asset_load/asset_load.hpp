@@ -7,7 +7,7 @@ struct Char
 {
 	char c;
 	std::vector<float> uvs;
-    int charSize;
+    int charWidth;
     int charHeight;
 };
 

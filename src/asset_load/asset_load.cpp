@@ -143,8 +143,8 @@ std::vector<Char> ParseFNT(const char* path)
 
 				float startx = (float) current.x / block2.scaleW;
 				float endx = (float) (current.x + current.width) / block2.scaleW;
-				float starty = 1.0f - (float) (current.y + current.height) / block2.scaleH;
-				float endy = 1.0f - (float) current.y / block2.scaleH;
+				float starty = (float) current.y / block2.scaleH;
+				float endy = (float) (current.y + current.height) / block2.scaleH;
 
 				std::vector<float> tempUVs
 				{

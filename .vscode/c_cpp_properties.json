@@ -19,7 +19,8 @@
                 "${workspaceFolder}/*",
                 "${workspaceFolder}/thirdparty/glad/include",
                 "${workspaceFolder}/thirdparty/stb_image",
-                "${workspaceFolder}/thirdparty/SDL2/include"
+                "${workspaceFolder}/thirdparty/SDL2/include",
+                "${workspaceFolder}/thirdparty/glm"
             ],
             "defines": [
                 "_DEBUG",
