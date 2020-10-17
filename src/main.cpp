@@ -13,48 +13,26 @@ int main()
 {
 	SDL_SetMainReady();
 
-	const int WIDTH = 640;
-	const int HEIGHT = 480;
-	Display display("Text Editor", 500, 500);
-
+	// Parse the FNT file to get info for each character
 	std::vector<Char> chars = ParseFNT("res/font/roboto-mono.fnt");
-	int numRows = HEIGHT / chars[0].charHeight;
-	int numColls = WIDTH / chars[0].charWidth;
+
+	// Scale down / up font size
+	float scale = 0.5f;
+	float fontWidth = chars[0].charWidth * scale;
+	float fontHeight = chars[0].charHeight * scale;
+
+	int numRows = 25;
+	int numColls = 80;
+	std::vector<char> content;
+	content.reserve(numRows * numColls);
 
 	std::vector<float> uvs, vertices;
 	uvs.reserve(numRows * numColls * 12);
 	vertices.reserve(numRows * numColls * 18);
 
-	for(int i = 0; i < numRows; i++)
-	for(int j = 0; j < numColls; j++)
-	{
-		int currentIndex = j + i * numColls;
-		if(currentIndex >= (int)chars.size())
-		{
-			i = numRows;
-			break;
-		}
-
-		Char& currentChar = chars[currentIndex];
-		
-		float startx = j * currentChar.charWidth;
-		float endx = startx + currentChar.charWidth;
-		float starty = i * currentChar.charHeight;
-		float endy = starty + currentChar.charHeight;
-
-		std::vector<float> tempVertices
-		{
-			startx, starty, 0.0f, 
-			endx, starty, 0.0f,
-			endx, endy,	0.0f,
-			endx, endy, 0.0f,
-			startx, endy, 0.0f, 
-			startx, starty, 0.0f
-		};
-		
-		vertices.insert(vertices.end(), tempVertices.begin(), tempVertices.end());
-		uvs.insert(uvs.end(), currentChar.uvs.begin(), currentChar.uvs.end());
-	}
+	int windowWidth = numColls * fontWidth;
+	int windowHeight = numRows * fontHeight;
+	Display display("Text Editor", windowWidth, windowHeight);
 
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -64,12 +42,12 @@ int main()
 	glGenBuffers(2, VBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, (int)vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 18 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, (int)uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 12 * sizeof(float), uvs.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
@@ -79,7 +57,7 @@ int main()
 	glUseProgram(shader.ID);
 	glUniform1i(shader.uniforms["tex"], atlas.index);
 
-	glm::mat4 projection = glm::ortho(0.0f, (float)WIDTH, (float)HEIGHT, 0.0f);
+	glm::mat4 projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f);
 	glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 
 	// Render loop
@@ -93,6 +71,41 @@ int main()
 			SDL_Quit();
 			return 0;
 		}
+
+		vertices.clear();
+		uvs.clear();
+
+		for(int i = 0; i < numRows; i++)
+		for(int j = 0; j < numColls; j++)
+		{
+			int currentIndex = j + i * numColls;
+
+			Char& currentChar = chars[rand() % (127 - 32) + 32 - ' '];
+
+			float startx = j * fontWidth;
+			float endx = startx + fontWidth;
+			float starty = i * fontHeight;
+			float endy = starty + fontHeight;
+
+			std::vector<float> tempVertices
+			{
+				startx, starty, 0.0f, 
+				endx, starty, 0.0f,
+				endx, endy,	0.0f,
+				endx, endy, 0.0f,
+				startx, endy, 0.0f, 
+				startx, starty, 0.0f
+			};
+
+			vertices.insert(vertices.end(), tempVertices.begin(), tempVertices.end());
+			uvs.insert(uvs.end(), currentChar.uvs.begin(), currentChar.uvs.end());
+		}
+
+		// Update buffer contents
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, (int)vertices.size() * sizeof(float), vertices.data());
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, (int)uvs.size() * sizeof(float), uvs.data());
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
