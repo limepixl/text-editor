@@ -46,4 +46,6 @@ Display::Display(const char* title, unsigned int width, unsigned int height)
 	}
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glViewport(0, 0, width, height);
+
+	SDL_GL_SetSwapInterval(1);
 }
