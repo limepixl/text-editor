@@ -30,6 +30,28 @@ int main()
 	uvs.reserve(numRows * numColls * 12);
 	vertices.reserve(numRows * numColls * 18);
 
+	// Precalculate vertices (only needs to be done once)
+	for(int i = 0; i < numRows; i++)
+	for(int j = 0; j < numColls; j++)
+	{
+		float startx = j * fontWidth;
+		float endx = startx + fontWidth;
+		float starty = i * fontHeight;
+		float endy = starty + fontHeight;
+
+		std::vector<float> tempVertices
+		{
+			startx, starty, 0.0f, 
+			endx, starty, 0.0f,
+			endx, endy,	0.0f,
+			endx, endy, 0.0f,
+			startx, endy, 0.0f, 
+			startx, starty, 0.0f
+		};
+
+		vertices.insert(vertices.end(), tempVertices.begin(), tempVertices.end());
+	}
+
 	int windowWidth = numColls * fontWidth;
 	int windowHeight = numRows * fontHeight;
 	Display display("Text Editor", windowWidth, windowHeight);
@@ -42,7 +64,7 @@ int main()
 	glGenBuffers(2, VBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 18 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, (int)vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
@@ -72,7 +94,6 @@ int main()
 			return 0;
 		}
 
-		vertices.clear();
 		uvs.clear();
 
 		for(int i = 0; i < numRows; i++)
@@ -81,29 +102,10 @@ int main()
 			int currentIndex = j + i * numColls;
 
 			Char& currentChar = chars[rand() % (127 - 32) + 32 - ' '];
-
-			float startx = j * fontWidth;
-			float endx = startx + fontWidth;
-			float starty = i * fontHeight;
-			float endy = starty + fontHeight;
-
-			std::vector<float> tempVertices
-			{
-				startx, starty, 0.0f, 
-				endx, starty, 0.0f,
-				endx, endy,	0.0f,
-				endx, endy, 0.0f,
-				startx, endy, 0.0f, 
-				startx, starty, 0.0f
-			};
-
-			vertices.insert(vertices.end(), tempVertices.begin(), tempVertices.end());
 			uvs.insert(uvs.end(), currentChar.uvs.begin(), currentChar.uvs.end());
 		}
 
 		// Update buffer contents
-		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, (int)vertices.size() * sizeof(float), vertices.data());
 		glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, (int)uvs.size() * sizeof(float), uvs.data());
 
