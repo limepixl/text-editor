@@ -5,6 +5,7 @@
 #include <cmath>
 #include "window/window.hpp"
 #include "asset_load/asset_load.hpp"
+#include "event/event.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -105,49 +106,11 @@ int main()
 			case SDL_QUIT:
 				SDL_Quit();
 				return 0;
-	
+
 				break;
 			case SDL_KEYDOWN:
-				if(e.key.keysym.sym == SDLK_LEFT)
-				{
-					if(cursorX == 0)
-					{
-						if(cursorY > 0)
-						{
-							cursorX = numColls;
-							cursorY--;
-						}
-					}
-					else
-						cursorX--;
-				}
-	
-				if(e.key.keysym.sym == SDLK_RIGHT)
-				{
-					if(cursorX == numColls - 1)
-					{
-						if(cursorY < numRows - 1)
-						{
-							cursorX = 0;
-							cursorY++;
-						}
-					} 
-					else
-						cursorX++;
-				}
-	
-				if(e.key.keysym.sym == SDLK_UP)
-				{
-					if(cursorY > 0)
-						cursorY--;
-				}
-	
-				if(e.key.keysym.sym == SDLK_DOWN)
-				{
-					if(cursorY < numRows - 1)
-						cursorY++;
-				}
-	
+				ProcessKeyboard(e, contentRows, cursorX, cursorY, numRows, numColls);
+
 				break;
 			default:
 				break;	
@@ -155,11 +118,6 @@ int main()
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		// Parse text file as rows of characters
-		contentRows.clear();
-		contentRows.resize(numRows);
-		ParseText("res/textfiles/test1.txt", contentRows);
 
 		for(int i = 0; i < numRows; i++)
 		{
