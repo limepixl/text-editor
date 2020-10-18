@@ -17,7 +17,7 @@
 int main()
 {
     int w, h, c;
-    unsigned char* data = stbi_load("res/font/roboto-mono_0.png", &w, &h, &c, 0);
+    unsigned char* data = stbi_load("res/font/roboto-mono_1.png", &w, &h, &c, 0);
     if(data == NULL)
         printf("Failed to load data!\n");
     

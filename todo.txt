@@ -1,0 +1,3 @@
+- A sort of cache, so that unchanging text doesn't re-render each frame
+- Text highlighting
+- Actually load the whole file in memory and don't just load a fixed number of rows

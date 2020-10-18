@@ -231,3 +231,33 @@ Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath)
 
 	return result;
 }
+
+void ParseText(const char* path, std::vector<std::string>& contentRows)
+{
+	FILE* textfile = fopen(path, "r");
+	if(!textfile)
+	{
+		printf("Failed to load textfile at path: %s\n", path);
+		fclose(textfile);
+		return;
+	}
+
+	int numLinesProcessed = 0;
+	int maxLines = (int)contentRows.size();
+
+	// 80 characters and null term.
+	char line[81];
+	while(fgets(line, sizeof(line), textfile) != nullptr)
+	{
+		// Remove trailing newline
+		// TODO: Fix line-wrapping over 80 characters
+		int length = strlen(line);
+		if(line[length - 1] == '\n')
+			line[--length] = '\0';
+
+		if(numLinesProcessed < maxLines)
+			contentRows[numLinesProcessed++] = std::string(line);
+	}
+
+	fclose(textfile);
+}
