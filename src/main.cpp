@@ -22,6 +22,7 @@ int main()
 	float fontWidth = chars[0].charWidth * scale;
 	float fontHeight = chars[0].charHeight * scale;
 
+	// Editor layout
 	int numRows = 25;
 	int numColls = 80;
 	std::vector<std::string> contentRows;
@@ -35,6 +36,33 @@ int main()
 	int windowHeight = numRows * fontHeight;
 	Display display("Text Editor", windowWidth, windowHeight);
 
+	// Cursor info
+	int cursorX = 0;
+	int cursorY = 0;
+
+	float cursorVerts[]
+	{
+		0.0f, 0.0f, 0.0f,
+		fontWidth, 0.0f, 0.0f,
+		fontWidth, fontHeight, 0.0f,
+		fontWidth, fontHeight, 0.0f,
+		0.0f, fontHeight, 0.0f,
+		0.0f, 0.0f, 0.0f
+	};
+	
+	GLuint cursorVAO;
+	glGenVertexArrays(1, &cursorVAO);
+	glBindVertexArray(cursorVAO);
+
+	GLuint cursorVBO;
+	glGenBuffers(1, &cursorVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
+	glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), cursorVerts, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	// Editor's data
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -61,6 +89,10 @@ int main()
 	glm::mat4 projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f);
 	glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 
+	Shader cursorShader = LoadShaderFromFile("res/shader/cursor.vert", "res/shader/cursor.frag");
+	glUseProgram(cursorShader.ID);
+	glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
+
 	// Render loop
 	while(true)
 	{
@@ -72,6 +104,8 @@ int main()
 			SDL_Quit();
 			return 0;
 		}
+
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Parse text file as rows of characters
 		contentRows.clear();
@@ -107,6 +141,7 @@ int main()
 		// Update buffer contents
 		int vertexCount = (int)vertices.size() / 3;
 
+		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, (int)vertices.size() * sizeof(float), vertices.data());
 		if(!vertices.empty())
@@ -117,10 +152,16 @@ int main()
 		if(!uvs.empty())
 			uvs.clear();
 
-		glClear(GL_COLOR_BUFFER_BIT);
-
 		if(vertexCount > 0)
 			glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+
+		// Update cursor's model matrix
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, glm::vec3(cursorX * fontWidth, cursorY * fontHeight, 0.0f));
+		glUniformMatrix4fv(cursorShader.uniforms["model"], 1, GL_FALSE, &model[0][0]);
+
+		glBindVertexArray(cursorVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		SDL_GL_SwapWindow(display.window);
 	}
