@@ -99,10 +99,57 @@ int main()
 		// Handle events
 		SDL_Event e;
 		SDL_PollEvent(&e);
-		if(e.type == SDL_QUIT)
+		switch(e.type)
 		{
+		case SDL_QUIT:
 			SDL_Quit();
 			return 0;
+
+			break;
+		case SDL_KEYDOWN:
+			if(e.key.keysym.sym == SDLK_LEFT)
+			{
+				if(cursorX == 0)
+				{
+					if(cursorY > 0)
+					{
+						cursorX = numColls;
+						cursorY--;
+					}
+				}
+				else
+					cursorX--;
+			}
+
+			if(e.key.keysym.sym == SDLK_RIGHT)
+			{
+				if(cursorX == numColls - 1)
+				{
+					if(cursorY < numRows - 1)
+					{
+						cursorX = 0;
+						cursorY++;
+					}
+				} 
+				else
+					cursorX++;
+			}
+
+			if(e.key.keysym.sym == SDLK_UP)
+			{
+				if(cursorY > 0)
+					cursorY--;
+			}
+
+			if(e.key.keysym.sym == SDLK_DOWN)
+			{
+				if(cursorY < numRows - 1)
+					cursorY++;
+			}
+
+			break;
+		default:
+			break;	
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
