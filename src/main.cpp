@@ -94,6 +94,10 @@ int main()
 	glUseProgram(cursorShader.ID);
 	glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 
+	std::unordered_map<SDL_Keycode, bool> keycodes;
+
+	SDL_StartTextInput();
+
 	// Render loop
 	while(true)
 	{
@@ -101,21 +105,39 @@ int main()
 		SDL_Event e;
 		while(SDL_PollEvent(&e))
 		{
-			switch(e.type)
+			if(e.type == SDL_QUIT)
 			{
-			case SDL_QUIT:
 				SDL_Quit();
 				return 0;
+			}
+			else if(e.type == SDL_KEYDOWN)
+			{
+				SDL_Keycode& code = e.key.keysym.sym;
 
-				break;
-			case SDL_KEYDOWN:
-				ProcessKeyboard(e, contentRows, cursorX, cursorY, numRows, numColls);
-
-				break;
-			default:
-				break;	
+				// Backspace
+				if(code == SDLK_BACKSPACE && (int)contentRows[cursorY].size() > 0 && cursorX > 0)
+				{
+					contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX - 1);
+					cursorX--;
+				}
+				// TODO: copy/paste
+				else if(code == SDLK_LEFT)
+					DecrementX(cursorX);
+				else if(code == SDLK_RIGHT)
+					IncrementX(cursorX, cursorY, numColls, contentRows);
+				else if(code == SDLK_UP)
+					DecrementY(cursorX, cursorY, contentRows);
+				else if(code == SDLK_DOWN || code == SDLK_RETURN)
+					IncrementY(cursorX, cursorY, numRows, contentRows);
+			}
+			else if(e.type == SDL_TEXTINPUT)
+			{
+				ProcessText(e, contentRows, cursorX, cursorY, numRows, numColls);
+				
 			}
 		}
+		
+		
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -177,6 +199,7 @@ int main()
 	}
 
 	// Cleanup
+	SDL_StopTextInput();
 	SDL_Quit();
 	return 0;
 }
