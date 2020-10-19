@@ -28,8 +28,8 @@ Display::Display(const char* title, unsigned int width, unsigned int height)
 	}
 
     // Setup OpenGL context settings
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GLContext context = SDL_GL_CreateContext(window);
 	if(context == nullptr)
@@ -49,5 +49,6 @@ Display::Display(const char* title, unsigned int width, unsigned int height)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	SDL_GL_SetSwapInterval(1);
+	if(SDL_GL_SetSwapInterval(1))
+		printf("Failed to set swap interval to 1.\n%s", SDL_GetError());
 }
