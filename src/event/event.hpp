@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 
-void ProcessKeyboard(std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int numRows, int numColls);
 void ProcessText(union SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int numRows, int numColls);
 
 inline void IncrementX(int& cursorX, int& cursorY, int numColls, std::vector<std::string>& contentRows)

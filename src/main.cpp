@@ -120,7 +120,6 @@ int main()
 					contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX - 1);
 					cursorX--;
 				}
-				// TODO: copy/paste
 				else if(code == SDLK_LEFT)
 					DecrementX(cursorX);
 				else if(code == SDLK_RIGHT)
@@ -129,16 +128,13 @@ int main()
 					DecrementY(cursorX, cursorY, contentRows);
 				else if(code == SDLK_DOWN || code == SDLK_RETURN)
 					IncrementY(cursorX, cursorY, numRows, contentRows);
+
+				// TODO: copy/paste
 			}
 			else if(e.type == SDL_TEXTINPUT)
-			{
 				ProcessText(e, contentRows, cursorX, cursorY, numRows, numColls);
-				
-			}
 		}
 		
-		
-
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		for(int i = 0; i < numRows; i++)
