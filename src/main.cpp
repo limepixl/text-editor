@@ -94,7 +94,11 @@ int main()
 	glUseProgram(cursorShader.ID);
 	glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 
-	std::unordered_map<SDL_Keycode, bool> keycodes;
+	// Used for FPS
+	Uint32 lastTime = SDL_GetTicks();
+	Uint32 averageFPS;
+	Uint32 frames = 0;
+	float fpsInterval = 1.0f; // seconds
 
 	SDL_StartTextInput();
 
@@ -191,6 +195,17 @@ int main()
 		glBindVertexArray(cursorVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		// FPS calculations
+		frames++;
+		if(lastTime < SDL_GetTicks() - fpsInterval * 1000.0f)
+		{
+			lastTime = SDL_GetTicks();
+			averageFPS = frames - 1;
+			frames = 0;
+			printf("Framerate: %d\n", averageFPS);
+		}
+
+		glFinish();
 		SDL_GL_SwapWindow(display.window);
 	}
 
