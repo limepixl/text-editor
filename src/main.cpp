@@ -19,23 +19,23 @@ int main()
 	std::vector<Char> chars = ParseFNT("res/font/roboto-mono.fnt");
 
 	// Scale down / up font size
-	float scale = 0.5;
+	float scale = 0.5f;
 	float fontWidth = chars[0].charWidth * scale;
 	float fontHeight = chars[0].charHeight * scale;
 
+	int windowWidth = 1280;
+	int windowHeight = 720;
+	Display display("Text Editor", windowWidth, windowHeight);
+
 	// Editor layout
-	int numRows = 25;
-	int numColls = 80;
+	int numRows = windowHeight / fontHeight;
+	int numColls = windowWidth / fontWidth;
 	std::vector<std::string> contentRows;
 	contentRows.resize(numRows);
 
 	std::vector<float> uvs, vertices;
 	uvs.reserve(numRows * numColls * 12);
 	vertices.reserve(numRows * numColls * 18);
-
-	int windowWidth = numColls * fontWidth;
-	int windowHeight = numRows * fontHeight;
-	Display display("Text Editor", windowWidth, windowHeight);
 
 	// Cursor info
 	int cursorX = 0;
@@ -113,6 +113,28 @@ int main()
 			{
 				SDL_Quit();
 				return 0;
+			}
+			else if(e.type == SDL_WINDOWEVENT)
+			{
+				if(e.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
+					display.width = e.window.data1;
+					display.height = e.window.data2;
+
+					// Update viewport and projection matrix
+					glViewport(0, 0, display.width, display.height);
+					projection = glm::ortho(0.0f, (float)display.width, (float)display.height, 0.0f);
+					glUseProgram(shader.ID);
+					glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
+					glUseProgram(cursorShader.ID);
+					glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
+
+					numRows = display.height / fontHeight;
+					numColls = display.width / fontWidth;
+
+					// Update content vector
+					contentRows.resize(numRows);
+				}
 			}
 			else if(e.type == SDL_KEYDOWN)
 			{

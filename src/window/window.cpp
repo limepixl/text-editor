@@ -18,7 +18,7 @@ Display::Display(const char* title, unsigned int width, unsigned int height)
 		SDL_WINDOWPOS_CENTERED, 
 		width,
 		height,
-		SDL_WINDOW_OPENGL
+		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
 	);
 
 	if(window == nullptr)
