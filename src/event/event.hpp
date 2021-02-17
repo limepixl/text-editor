@@ -25,7 +25,7 @@ inline void DecrementX(int& cursorX, int& lastCursorX)
 	}
 }
 
-inline void IncrementY(int& cursorX, int& cursorY, int& lastCursorX, int numRows, std::vector<std::string>& contentRows)
+inline void IncrementY(int& cursorX, int& cursorY, int lastCursorX, int numRows, std::vector<std::string>& contentRows)
 {
 	if(cursorY < numRows - 1)
 		cursorY++;
@@ -37,7 +37,7 @@ inline void IncrementY(int& cursorX, int& cursorY, int& lastCursorX, int numRows
 		cursorX = std::min((int)contentRows[cursorY].size(), lastCursorX);
 }
 
-inline void DecrementY(int& cursorX, int& cursorY, int& lastCursorX, std::vector<std::string>& contentRows)
+inline void DecrementY(int& cursorX, int& cursorY, int lastCursorX, std::vector<std::string>& contentRows)
 {
 	if(cursorY > 0)
 		cursorY--;

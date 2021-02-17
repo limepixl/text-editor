@@ -151,9 +151,11 @@ int main()
 						contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX - 1);
 						cursorX--;
 					}
-					else if((int)contentRows[cursorY].size() == 0) // There isn't a character in the line, so go to the previous line
+					else if(cursorX == 0 && cursorY > 0) // There isn't a character in the line, so go to the previous line
 					{
-
+						DecrementY(cursorX, cursorY, (int)contentRows[cursorY-1].size(), contentRows);
+						contentRows[cursorY].append(contentRows[cursorY + 1]);
+						contentRows[cursorY+1] = "";
 					}
 				}
 				else if(code == SDLK_LEFT)
@@ -162,10 +164,19 @@ int main()
 					IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
 				else if(code == SDLK_UP)
 					DecrementY(cursorX, cursorY, lastCursorX, contentRows);
-				else if(code == SDLK_DOWN || code == SDLK_RETURN)
+				else if(code == SDLK_DOWN || code == SDLK_RETURN) // TODO: add enter functionality
 					IncrementY(cursorX, cursorY, lastCursorX, numRows, contentRows);
-				else if(code == SDLK_DELETE && (int)contentRows[cursorY].size() > 0 && cursorX < (int)contentRows[cursorY].size())
-					contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX);
+				else if(code == SDLK_DELETE)
+				{
+					// There is content to be deleted
+					if((int)contentRows[cursorY].size() > 0 && cursorX < (int)contentRows[cursorY].size())
+						contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX);
+					else // Delete newline char and append next line to current
+					{
+						contentRows[cursorY].append(contentRows[cursorY+1]);
+						contentRows[cursorY+1] = "";
+					}
+				}
 				else if(code == SDLK_HOME)
 					cursorX = 0;
 				else if(code == SDLK_END)
