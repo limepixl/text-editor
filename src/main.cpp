@@ -155,7 +155,7 @@ int main()
 					{
 						DecrementY(cursorX, cursorY, (int)contentRows[cursorY-1].size(), contentRows);
 						contentRows[cursorY].append(contentRows[cursorY + 1]);
-						contentRows[cursorY+1] = "";
+						contentRows.pop_back();
 					}
 				}
 				else if(code == SDLK_LEFT)
@@ -187,7 +187,7 @@ int main()
 					else if(cursorY + 1 < (int)contentRows.size()) // Delete newline char and append next line to current
 					{
 						contentRows[cursorY].append(contentRows[cursorY+1]);
-						contentRows[cursorY+1] = "";
+						contentRows.pop_back();
 					}
 				}
 				else if(code == SDLK_HOME)
