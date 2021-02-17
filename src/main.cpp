@@ -95,16 +95,17 @@ int main()
 	glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 
 	// Used for FPS
-	Uint32 lastTime = SDL_GetTicks();
-	Uint32 averageFPS;
-	Uint32 frames = 0;
-	float fpsInterval = 1.0f; // seconds
+	Uint64 start, end;
+	double targetFPS = 1000.0f / 60.0f /*change this*/;
 
 	SDL_StartTextInput();
 
 	// Render loop
 	while(true)
 	{
+		// Start counting ms
+		start = SDL_GetPerformanceCounter();
+
 		// Handle events
 		SDL_Event e;
 		while(SDL_PollEvent(&e))
@@ -217,18 +218,15 @@ int main()
 		glBindVertexArray(cursorVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		// FPS calculations
-		frames++;
-		if(lastTime < SDL_GetTicks() - fpsInterval * 1000.0f)
-		{
-			lastTime = SDL_GetTicks();
-			averageFPS = frames - 1;
-			frames = 0;
-			printf("Framerate: %d\n", averageFPS);
-		}
-
 		glFinish();
 		SDL_GL_SwapWindow(display.window);
+
+		// End counting ms and calculate elapsed ms
+		end = SDL_GetPerformanceCounter();
+		float elapsed = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+		printf("Elapsed ms: %.2f\nFPS: %.2f\n", elapsed, 1000.0 / elapsed);
+		if(elapsed < targetFPS)
+			SDL_Delay(floor(targetFPS - elapsed));
 	}
 
 	// Cleanup
