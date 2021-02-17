@@ -4,7 +4,7 @@
 
 void ProcessText(union SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int& lastCursorX, int numColls);
 
-inline void IncrementX(int& cursorX, int& cursorY, int& lastCursorX,  int numColls, std::vector<std::string>& contentRows)
+inline void IncrementX(int& cursorX, int& cursorY, int& lastCursorX, int numColls, std::vector<std::string>& contentRows)
 {
 	if(contentRows[cursorY].empty())
 		return;
@@ -25,9 +25,9 @@ inline void DecrementX(int& cursorX, int& lastCursorX)
 	}
 }
 
-inline void IncrementY(int& cursorX, int& cursorY, int lastCursorX, std::vector<std::string>& contentRows)
+inline void IncrementY(int& cursorX, int& cursorY, int lastCursorX, std::vector<std::string>& contentRows, int editableRows)
 {
-	if(cursorY < (int)contentRows.size() - 1)
+	if(cursorY < editableRows - 1)
 		cursorY++;
 
 	// Adjust cursorX to be at the end of the next line

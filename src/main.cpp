@@ -31,7 +31,8 @@ int main()
 	int numRows = windowHeight / fontHeight;
 	int numColls = windowWidth / fontWidth;
 	std::vector<std::string> contentRows;
-	contentRows.resize(1);
+	contentRows.resize(numRows);
+	int editableRows = 1;
 
 	std::vector<float> uvs, vertices;
 	uvs.reserve(numRows * numColls * 12);
@@ -155,7 +156,9 @@ int main()
 					{
 						DecrementY(cursorX, cursorY, (int)contentRows[cursorY-1].size(), contentRows);
 						contentRows[cursorY].append(contentRows[cursorY + 1]);
-						contentRows.pop_back();
+						contentRows[cursorY+1] = "";
+						lastCursorX = cursorX;
+						editableRows--;
 					}
 				}
 				else if(code == SDLK_LEFT)
@@ -165,29 +168,36 @@ int main()
 				else if(code == SDLK_UP)
 					DecrementY(cursorX, cursorY, lastCursorX, contentRows);
 				else if(code == SDLK_DOWN)
-					IncrementY(cursorX, cursorY, lastCursorX, contentRows);
+					IncrementY(cursorX, cursorY, lastCursorX, contentRows, editableRows);
 				else if(code == SDLK_RETURN)
 				{
 					std::string leftover(contentRows[cursorY].begin() + cursorX, contentRows[cursorY].end());
 					contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX, contentRows[cursorY].end());
-					if(cursorY == (int)contentRows.size() - 1)
-						contentRows.push_back(leftover);
+					if(cursorY == editableRows - 1)
+					{
+						if((int)contentRows.size() == editableRows)
+							contentRows.push_back(leftover);
+						else
+							contentRows[cursorY+1] = leftover;
+					}
 					else
 						contentRows.insert(contentRows.begin() + cursorY + 1, leftover);
 
 					cursorX = 0;
 					lastCursorX = 0;
 					cursorY++;
+					editableRows++;
 				}
 				else if(code == SDLK_DELETE)
 				{
 					// There is content to be deleted
 					if((int)contentRows[cursorY].size() > 0 && cursorX < (int)contentRows[cursorY].size())
 						contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX);
-					else if(cursorY + 1 < (int)contentRows.size()) // Delete newline char and append next line to current
+					else if(cursorY + 1 < editableRows) // Delete newline char and append next line to current
 					{
 						contentRows[cursorY].append(contentRows[cursorY+1]);
-						contentRows.pop_back();
+						contentRows[cursorY+1] = "";
+						editableRows--;
 					}
 				}
 				else if(code == SDLK_HOME)
@@ -203,7 +213,7 @@ int main()
 		
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		for(int i = 0; i < (int)contentRows.size(); i++)
+		for(int i = 0; i < editableRows; i++)
 		{
 			int jmax = std::min((int)contentRows[i].size(), numColls);
 			for(int j = 0; j < jmax; j++)
