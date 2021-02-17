@@ -40,6 +40,7 @@ int main()
 	// Cursor info
 	int cursorX = 0;
 	int cursorY = 0;
+	int lastCursorX = 0;
 
 	float cursorVerts[]
 	{
@@ -142,30 +143,38 @@ int main()
 				SDL_Keycode& code = e.key.keysym.sym;
 
 				// Backspace
-				if(code == SDLK_BACKSPACE && (int)contentRows[cursorY].size() > 0 && cursorX > 0)
+				if(code == SDLK_BACKSPACE)
 				{
-					contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX - 1);
-					cursorX--;
+					// If there are characters to be deleted
+					if((int)contentRows[cursorY].size() > 0 && cursorX > 0)
+					{
+						contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX - 1);
+						cursorX--;
+					}
+					else if((int)contentRows[cursorY].size() == 0) // There isn't a character in the line, so go to the previous line
+					{
+
+					}
 				}
 				else if(code == SDLK_LEFT)
-					DecrementX(cursorX);
+					DecrementX(cursorX, lastCursorX);
 				else if(code == SDLK_RIGHT)
-					IncrementX(cursorX, cursorY, numColls, contentRows);
+					IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
 				else if(code == SDLK_UP)
-					DecrementY(cursorX, cursorY, contentRows);
+					DecrementY(cursorX, cursorY, lastCursorX, contentRows);
 				else if(code == SDLK_DOWN || code == SDLK_RETURN)
-					IncrementY(cursorX, cursorY, numRows, contentRows);
+					IncrementY(cursorX, cursorY, lastCursorX, numRows, contentRows);
 				else if(code == SDLK_DELETE && (int)contentRows[cursorY].size() > 0 && cursorX < (int)contentRows[cursorY].size())
 					contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX);
 				else if(code == SDLK_HOME)
 					cursorX = 0;
 				else if(code == SDLK_END)
 					cursorX = (int)contentRows[cursorY].size();
-				// Test
+
 				// TODO: copy/paste
 			}
 			else if(e.type == SDL_TEXTINPUT)
-				ProcessText(e, contentRows, cursorX, cursorY, numRows, numColls);
+				ProcessText(e, contentRows, cursorX, cursorY, lastCursorX, numRows, numColls);
 		}
 		
 		glClear(GL_COLOR_BUFFER_BIT);

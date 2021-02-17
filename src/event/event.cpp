@@ -1,7 +1,7 @@
 #include "event.hpp"
 #include <SDL2/SDL.h>
 
-void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int numRows, int numColls)
+void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int& lastCursorX, int numRows, int numColls)
 {
 	(void)numRows; // unused
 
@@ -10,5 +10,5 @@ void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& curso
 	if((int)current.size() > numColls)
 		current.pop_back();
 	
-	IncrementX(cursorX, cursorY, numColls, contentRows);
+	IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
 }
