@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-void ProcessText(union SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int& lastCursorX, int numRows, int numColls);
+void ProcessText(union SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int& lastCursorX, int numColls);
 
 inline void IncrementX(int& cursorX, int& cursorY, int& lastCursorX,  int numColls, std::vector<std::string>& contentRows)
 {
@@ -25,9 +25,9 @@ inline void DecrementX(int& cursorX, int& lastCursorX)
 	}
 }
 
-inline void IncrementY(int& cursorX, int& cursorY, int lastCursorX, int numRows, std::vector<std::string>& contentRows)
+inline void IncrementY(int& cursorX, int& cursorY, int lastCursorX, std::vector<std::string>& contentRows)
 {
-	if(cursorY < numRows - 1)
+	if(cursorY < (int)contentRows.size() - 1)
 		cursorY++;
 
 	// Adjust cursorX to be at the end of the next line
