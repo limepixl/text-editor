@@ -155,6 +155,12 @@ int main()
 					DecrementY(cursorX, cursorY, contentRows);
 				else if(code == SDLK_DOWN || code == SDLK_RETURN)
 					IncrementY(cursorX, cursorY, numRows, contentRows);
+				else if(code == SDLK_DELETE && (int)contentRows[cursorY].size() > 0 && cursorX < (int)contentRows[cursorY].size())
+					contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX);
+				else if(code == SDLK_HOME)
+					cursorX = 0;
+				else if(code == SDLK_END)
+					cursorX = (int)contentRows[cursorY].size();
 
 				// TODO: copy/paste
 			}
