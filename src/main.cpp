@@ -161,7 +161,7 @@ int main()
 					cursorX = 0;
 				else if(code == SDLK_END)
 					cursorX = (int)contentRows[cursorY].size();
-
+				// Test
 				// TODO: copy/paste
 			}
 			else if(e.type == SDL_TEXTINPUT)
