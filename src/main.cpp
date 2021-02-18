@@ -242,7 +242,7 @@ int main()
 					{
 						if(cursorX == 0 && cursorY > 0)
 						{
-							DecrementY(cursorX, cursorY, (int)contentRows[cursorY-1].size() - 1, contentRows);
+							DecrementY(cursorX, cursorY, (int)contentRows[cursorY-1].size(), contentRows);
 							lastCursorX = cursorX;
 						}
 						else
