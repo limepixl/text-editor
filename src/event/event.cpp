@@ -60,7 +60,7 @@ void MoveWordRight(int& cursorX, int& cursorY, std::vector<std::string>& content
 	{
 		if(i == (int)current.size() - 1)
 		{
-			cursorX = (int)current.size() - 1;
+			cursorX = (int)current.size();
 			return;
 		}
 
@@ -73,7 +73,7 @@ void MoveWordRight(int& cursorX, int& cursorY, std::vector<std::string>& content
 				return;
 			}
 
-			cursorX = (int)current.size() - 1;
+			cursorX = (int)current.size();
 			return;
 		}
 
