@@ -31,8 +31,10 @@ int main()
 	int numRows = windowHeight / fontHeight;
 	int numColls = windowWidth / fontWidth;
 	std::vector<std::string> contentRows;
-	contentRows.resize(numRows);
-	int editableRows = 1;
+
+	// TODO: add change of buffer size when exceeding max numrows and collumns
+	ParseText("res/textfiles/stb_image.h", contentRows, numRows, numColls);
+	int editableRows = (int)contentRows.size();
 
 	std::vector<float> uvs, vertices;
 	uvs.reserve(numRows * numColls * 12);
@@ -137,7 +139,7 @@ int main()
 
 	// Scrolling
 	float scroll = 0.0f;
-	float scrollSensitivity = 20.0f;
+	float scrollSensitivity = 50.0f;
 
 	// Render loop
 	while(true)
@@ -191,7 +193,7 @@ int main()
 			{
 				if(e.button.button == SDL_BUTTON_LEFT)
 				{
-					cursorY = e.button.y / fontHeight;
+					cursorY = (e.button.y + scroll) / fontHeight;
 					cursorY = std::min(std::max(cursorY, 0), editableRows-1);
 
 					std::string& newLine = contentRows[cursorY];

@@ -237,7 +237,7 @@ Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath)
 	return result;
 }
 
-void ParseText(const char* path, std::vector<std::string>& contentRows)
+void ParseText(const char* path, std::vector<std::string>& contentRows, int& numRows, int& numColls)
 {
 	FILE* textfile = fopen(path, "r");
 	if(!textfile)
@@ -248,21 +248,30 @@ void ParseText(const char* path, std::vector<std::string>& contentRows)
 	}
 
 	int numLinesProcessed = 0;
-	int maxLines = (int)contentRows.size();
 
-	// 80 characters and null term.
-	char line[81];
+	char line[1025];
 	while(fgets(line, sizeof(line), textfile) != nullptr)
 	{
 		// Remove trailing newline
 		// TODO: Fix line-wrapping over 80 characters
 		int length = strlen(line);
-		if(line[length - 1] == '\n')
+		if(numColls < length)
+			numColls = length;
+
+		if(line[length - 1] != '\0')
 			line[--length] = '\0';
 
-		if(numLinesProcessed < maxLines)
-			contentRows[numLinesProcessed++] = std::string(line);
+		std::string tmp(line);
+		auto l = tmp.find('\0');
+		if(l != std::string::npos)
+			tmp.resize(tmp.find('\0'));
+
+		contentRows.push_back(std::string(line));
+		numLinesProcessed++;
 	}
+
+	if(numRows < numLinesProcessed)
+		numRows = numLinesProcessed;
 
 	fclose(textfile);
 }

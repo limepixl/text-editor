@@ -15,4 +15,4 @@ struct Char
 std::vector<Char> ParseFNT(const char* path);
 Texture LoadTextureFromBinary(const char* path);
 Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath);
-void ParseText(const char* path, std::vector<std::string>& contentRows);
+void ParseText(const char* path, std::vector<std::string>& contentRows, int& numRows, int& numColls);
