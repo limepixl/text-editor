@@ -3,3 +3,5 @@
 - Actually load the whole file in memory and don't just load a fixed number of rows
 - Word wrapping
 - Scroll bar
+- Ctrl + Arrow keys for word traversal
+- Multiple cursors (long goal)
