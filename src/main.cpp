@@ -187,6 +187,19 @@ int main()
 				// Shouldn't scroll above first line
 				scroll = std::max(scroll, 0.0f);
 			}
+			else if(e.type == SDL_MOUSEBUTTONDOWN)
+			{
+				if(e.button.button == SDL_BUTTON_LEFT)
+				{
+					cursorY = e.button.y / fontHeight;
+					cursorY = std::min(std::max(cursorY, 0), editableRows-1);
+
+					std::string& newLine = contentRows[cursorY];
+					cursorX = e.button.x / fontWidth;
+					cursorX = std::min(std::max(cursorX, 0), (int)newLine.size());
+					lastCursorX = cursorX;
+				}
+			}
 			else if(e.type == SDL_KEYDOWN)
 			{
 				SDL_Keycode& code = e.key.keysym.sym;

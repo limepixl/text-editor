@@ -4,7 +4,15 @@
 void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int& lastCursorX, int numColls)
 {
 	std::string& current = contentRows[cursorY];
-	current += e.text.text;
+	const char* text = e.text.text;
+	std::string strText(text);
+
+	if(cursorX == (int)current.size())
+		current += text;
+	else
+		current = std::string(current.begin(), current.begin() + cursorX) +
+		          strText + std::string(current.begin() + cursorX, current.end());
+
 	if((int)current.size() > numColls)
 		current.pop_back();
 	
