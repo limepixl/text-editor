@@ -108,6 +108,9 @@ int main()
 		// Start counting ms
 		start = SDL_GetPerformanceCounter();
 
+		int numKeys;
+		const Uint8* keyboardState = SDL_GetKeyboardState(&numKeys);
+
 		// Handle events
 		SDL_Event e;
 		while(SDL_PollEvent(&e))
@@ -143,14 +146,23 @@ int main()
 			{
 				SDL_Keycode& code = e.key.keysym.sym;
 
+				bool ctrlDown = (keyboardState[SDL_SCANCODE_LCTRL] == 1 || keyboardState[SDL_SCANCODE_RCTRL]);
+
 				// Backspace
 				if(code == SDLK_BACKSPACE)
 				{
 					// If there are characters to be deleted
 					if((int)contentRows[cursorY].size() > 0 && cursorX > 0)
 					{
-						contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX - 1);
-						cursorX--;
+						if(ctrlDown)
+							DeleteWordLeft(cursorX, cursorY, contentRows);
+						else
+						{
+							contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX - 1);
+							cursorX--;
+						}
+
+						lastCursorX = cursorX;
 					}
 					else if(cursorX == 0 && cursorY > 0) // There isn't a character in the line, so go to the previous line
 					{
@@ -162,7 +174,15 @@ int main()
 					}
 				}
 				else if(code == SDLK_LEFT)
-					DecrementX(cursorX, lastCursorX);
+				{
+					if(ctrlDown)
+					{
+						MoveWordLeft(cursorX, cursorY, contentRows);
+						lastCursorX = cursorX;
+					}
+					else
+						DecrementX(cursorX, lastCursorX);
+				}
 				else if(code == SDLK_RIGHT)
 					IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
 				else if(code == SDLK_UP)

@@ -4,47 +4,11 @@
 
 void ProcessText(union SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int& lastCursorX, int numColls);
 
-inline void IncrementX(int& cursorX, int& cursorY, int& lastCursorX, int numColls, std::vector<std::string>& contentRows)
-{
-	if(contentRows[cursorY].empty())
-		return;
+void MoveWordLeft(int& cursorX, int& cursorY, std::vector<std::string>& contentRows);
 
-	if(cursorX < (int)contentRows[cursorY].size() && cursorX < numColls - 1)
-	{
-		cursorX++;
-		lastCursorX = cursorX;
-	}
-}
+void DeleteWordLeft(int& cursorX, int cursorY, std::vector<std::string>& contentRows);
 
-inline void DecrementX(int& cursorX, int& lastCursorX)
-{
-	if(cursorX > 0)
-	{
-		cursorX--;
-		lastCursorX = cursorX;
-	}
-}
-
-inline void IncrementY(int& cursorX, int& cursorY, int lastCursorX, std::vector<std::string>& contentRows, int editableRows)
-{
-	if(cursorY < editableRows - 1)
-		cursorY++;
-
-	// Adjust cursorX to be at the end of the next line
-	if(cursorX > (int)contentRows[cursorY].size())
-		cursorX = (int)contentRows[cursorY].size();
-	else
-		cursorX = std::min((int)contentRows[cursorY].size(), lastCursorX);
-}
-
-inline void DecrementY(int& cursorX, int& cursorY, int lastCursorX, std::vector<std::string>& contentRows)
-{
-	if(cursorY > 0)
-		cursorY--;
-	
-	// Adjust cursorX to be at the end of the previous line
-	if(cursorX > (int)contentRows[cursorY].size())
-		cursorX = (int)contentRows[cursorY].size();
-	else
-		cursorX = std::min((int)contentRows[cursorY].size(), lastCursorX);
-}
+void IncrementX(int& cursorX, int& cursorY, int& lastCursorX, int numColls, std::vector<std::string>& contentRows);
+void DecrementX(int& cursorX, int& lastCursorX);
+void IncrementY(int& cursorX, int& cursorY, int lastCursorX, std::vector<std::string>& contentRows, int editableRows);
+void DecrementY(int& cursorX, int& cursorY, int lastCursorX, std::vector<std::string>& contentRows);
