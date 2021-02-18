@@ -181,7 +181,15 @@ int main()
 						lastCursorX = cursorX;
 					}
 					else
-						DecrementX(cursorX, lastCursorX);
+					{
+						if(cursorX == 0 && cursorY > 0)
+						{
+							DecrementY(cursorX, cursorY, (int)contentRows[cursorY-1].size() - 1, contentRows);
+							lastCursorX = cursorX;
+						}
+						else
+							DecrementX(cursorX, lastCursorX);
+					}
 				}
 				else if(code == SDLK_RIGHT)
 				{
@@ -191,7 +199,16 @@ int main()
 						lastCursorX = cursorX;
 					}
 					else
-						IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
+					{
+						if(cursorX >= (int)contentRows[cursorY].size() - 1 && cursorY < editableRows - 1)
+						{
+							IncrementY(cursorX, cursorY, 0, contentRows, editableRows);
+							cursorX = 0;
+							lastCursorX = 0;
+						}
+						else
+							IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
+					}
 				}
 				else if(code == SDLK_UP)
 					DecrementY(cursorX, cursorY, lastCursorX, contentRows);
