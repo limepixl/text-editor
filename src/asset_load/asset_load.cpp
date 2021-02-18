@@ -108,7 +108,7 @@ std::vector<Char> ParseFNT(const char* path)
 
 			size_t strsize = strlen((const char*)(buffer + (byteIndex += 14)));
 			block1.stringPtr = new char[strsize + 1];
-			strncpy(block1.stringPtr, (const char*)(buffer + byteIndex), strsize);
+			strncpy(block1.stringPtr, (const char*)(buffer + byteIndex), strsize+1);
 			block1.stringPtr[strsize] = '\0';
 
 			byteIndex += strsize + 1;
@@ -127,7 +127,7 @@ std::vector<Char> ParseFNT(const char* path)
 			{
 				long strsize = strlen((const char*)(buffer + byteIndex));
 				block3.pageNames[i] = new char[strsize + 1];
-				strncpy(block3.pageNames[i], (const char*)(buffer + byteIndex), strsize);
+				strncpy(block3.pageNames[i], (const char*)(buffer + byteIndex), strsize+1);
 				byteIndex += strsize + 1;
 			}
 
