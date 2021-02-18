@@ -45,25 +45,58 @@ int main()
 
 	float cursorVerts[]
 	{
-		0.0f, 0.0f, 0.0f,
-		fontWidth, 0.0f, 0.0f,
-		fontWidth, fontHeight, 0.0f,
-		fontWidth, fontHeight, 0.0f,
-		0.0f, fontHeight, 0.0f,
-		0.0f, 0.0f, 0.0f
+		0.0f, 0.0f, 0.0f, 1.0, 0.0, 0.0,
+		fontWidth, 0.0f, 0.0f, 1.0, 0.0, 0.0,
+		fontWidth, fontHeight, 0.0f, 1.0, 0.0, 0.0,
+		fontWidth, fontHeight, 0.0f, 1.0, 0.0, 0.0,
+		0.0f, fontHeight, 0.0f, 1.0, 0.0, 0.0,
+		0.0f, 0.0f, 0.0f, 1.0, 0.0, 0.0
 	};
 	
 	GLuint cursorVAO;
 	glGenVertexArrays(1, &cursorVAO);
 	glBindVertexArray(cursorVAO);
 
-	GLuint cursorVBO;
-	glGenBuffers(1, &cursorVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
-	glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), cursorVerts, GL_STATIC_DRAW);
+	GLuint cursorVBO[2];
+	glGenBuffers(2, cursorVBO);
 
+	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), cursorVerts, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), cursorVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	// Line highlight data
+	float highlightVerts[]
+	{
+		0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f,
+		(float)windowWidth + 0.01f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f,
+		(float)windowWidth + 0.01f, fontHeight, 0.0f, 0.5f, 0.5f, 0.5f,
+		(float)windowWidth + 0.01f, fontHeight, 0.0f, 0.5f, 0.5f, 0.5f,
+		0.0f, fontHeight, 0.0f, 0.5f, 0.5f, 0.5f,
+		0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f,
+	};
+
+	GLuint highlightVAO;
+	glGenVertexArrays(1, &highlightVAO);
+	glBindVertexArray(highlightVAO);
+
+	GLuint highlightVBO[2];
+	glGenBuffers(2, highlightVBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, highlightVBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), highlightVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, highlightVBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), highlightVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	// Editor's data
 	GLuint VAO;
@@ -331,8 +364,18 @@ int main()
 		glUniformMatrix4fv(cursorShader.uniforms["model"], 1, GL_FALSE, &model[0][0]);
 		glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 
+		// Draw cursor
 		glBindVertexArray(cursorVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// Update highlight's model matrix
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, cursorY * fontHeight, 0.0f));
+		glUniformMatrix4fv(cursorShader.uniforms["model"], 1, GL_FALSE, &model[0][0]);
+
+		// Draw highlight
+		glBindVertexArray(highlightVAO);
+		glDrawArrays(GL_LINE_STRIP, 0, 6);
 
 		glFinish();
 		SDL_GL_SwapWindow(display.window);
