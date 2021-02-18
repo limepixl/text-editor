@@ -13,20 +13,59 @@ void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& curso
 
 void MoveWordLeft(int& cursorX, int& cursorY, std::vector<std::string>& contentRows)
 {
-	std::string& current = contentRows[cursorY];
+	std::string current = contentRows[cursorY];
 
-	for(int i = cursorX - 1; i >= 0; i--)
+	for(int i = cursorX - 1; i >= -1; i--)
 	{
-		if(i <= 0)
+		if(i == 0)
+		{
+			cursorX = 0;
+			return;
+		}
+
+		if(i == -1)
 		{
 			if(cursorY > 0)
 			{
 				current = contentRows[--cursorY];
-				i = (int)current.length();
-				continue;
+				cursorX = (int)current.length();
+				return;
 			}
 			
 			cursorX = 0;
+			return;
+		}
+
+		if(current[i] == ' ')
+		{
+			cursorX = i;
+			return;
+		}
+	}
+}
+
+void MoveWordRight(int& cursorX, int& cursorY, std::vector<std::string>& contentRows, int editableRows)
+{
+	std::string current = contentRows[cursorY];
+
+	for(int i = cursorX + 1; i <= (int)current.size() + 1; i++)
+	{
+		if(i == (int)current.size() - 1)
+		{
+			cursorX = (int)current.size() - 1;
+			return;
+		}
+
+		if(i == (int)current.size())
+		{
+			if(cursorY < editableRows - 1)
+			{
+				current = contentRows[++cursorY];
+				cursorX = 0;
+				return;
+			}
+
+			cursorX = (int)current.size() - 1;
 			return;
 		}
 
@@ -55,6 +94,26 @@ void DeleteWordLeft(int& cursorX, int cursorY, std::vector<std::string>& content
 		{
 			currentLine.erase(currentLine.begin() + i, currentLine.begin() + cursorX);
 			cursorX = i;
+			return;
+		}
+	}
+}
+
+void DeleteWordRight(int cursorX, int cursorY, std::vector<std::string>& contentRows)
+{
+	std::string& currentLine = contentRows[cursorY];
+
+	for(int i = cursorX + 1; i <= (int)currentLine.size() + 1; i++)
+	{
+		if(i == (int)currentLine.size())
+		{
+			currentLine.erase(currentLine.begin() + cursorX, currentLine.end());
+			return;
+		}
+
+		if(currentLine[i] == ' ')
+		{
+			currentLine.erase(currentLine.begin() + cursorX, currentLine.begin() + i);
 			return;
 		}
 	}

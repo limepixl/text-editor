@@ -168,7 +168,7 @@ int main()
 					{
 						DecrementY(cursorX, cursorY, (int)contentRows[cursorY-1].size(), contentRows);
 						contentRows[cursorY].append(contentRows[cursorY + 1]);
-						contentRows[cursorY+1] = "";
+						contentRows.erase(contentRows.begin() + cursorY + 1);
 						lastCursorX = cursorX;
 						editableRows--;
 					}
@@ -184,7 +184,15 @@ int main()
 						DecrementX(cursorX, lastCursorX);
 				}
 				else if(code == SDLK_RIGHT)
-					IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
+				{
+					if(ctrlDown)
+					{
+						MoveWordRight(cursorX, cursorY, contentRows, editableRows);
+						lastCursorX = cursorX;
+					}
+					else
+						IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
+				}
 				else if(code == SDLK_UP)
 					DecrementY(cursorX, cursorY, lastCursorX, contentRows);
 				else if(code == SDLK_DOWN)
@@ -212,11 +220,18 @@ int main()
 				{
 					// There is content to be deleted
 					if((int)contentRows[cursorY].size() > 0 && cursorX < (int)contentRows[cursorY].size())
-						contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX);
+					{
+						if(ctrlDown)
+						{
+							DeleteWordRight(cursorX, cursorY, contentRows);
+						}
+						else
+							contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX);
+					}
 					else if(cursorY + 1 < editableRows) // Delete newline char and append next line to current
 					{
 						contentRows[cursorY].append(contentRows[cursorY+1]);
-						contentRows[cursorY+1] = "";
+						contentRows.erase(contentRows.begin() + cursorY + 1);
 						editableRows--;
 					}
 				}
