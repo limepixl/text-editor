@@ -78,7 +78,8 @@ std::vector<Char> ParseFNT(const char* path)
 	rewind(fnt);
 
 	uint8_t* buffer = new uint8_t[size + 1];
-	fread(buffer, sizeof(uint8_t), size, fnt);
+	if((long)fread(buffer, sizeof(uint8_t), size, fnt) > size)
+		printf("Insufficient read!\n");
 	buffer[size] = '\0';
 	fclose(fnt);
 
@@ -88,9 +89,9 @@ std::vector<Char> ParseFNT(const char* path)
 
 	byteIndex = 4;
 
-	BlockType1 block1;
-	BlockType2 block2;
-	BlockType3 block3;
+	BlockType1 block1{};
+	BlockType2 block2{};
+	BlockType3 block3{};
 
 	std::vector<Char> chars;
 
@@ -176,7 +177,8 @@ Texture LoadTextureFromBinary(const char* path)
 		printf("Failed to load binary file from path: %s\n", path);
 
 	int w, h, c;
-	fscanf(binfile, "%d %d %d\n", &w, &h, &c);
+	if(fscanf(binfile, "%d %d %d\n", &w, &h, &c) == EOF)
+		printf("Insufficient scan!\n");
 	
 	long startingPos = ftell(binfile);
 	fseek(binfile, 0, SEEK_END);
@@ -184,7 +186,8 @@ Texture LoadTextureFromBinary(const char* path)
 	fseek(binfile, startingPos, SEEK_SET);
 
 	unsigned char* data = new unsigned char[size+1];
-	fread(data, sizeof(unsigned char), size, binfile);
+	if((long)fread(data, sizeof(unsigned char), size, binfile) > size)
+		printf("Insufficient read!\n");
 	data[size] = '\0';
 	Texture result(data, w, h, c);
 
@@ -205,7 +208,8 @@ Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath)
 	rewind(vRaw);
 
 	char* vSource = new char[size + 1];
-	fread(vSource, sizeof(unsigned char), size, vRaw);
+	if((long)fread(vSource, sizeof(unsigned char), size, vRaw) > size)
+		printf("Insufficient read!\n");
 	vSource[size] = '\0';
 
 	fclose(vRaw);
@@ -220,7 +224,8 @@ Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath)
 	rewind(fRaw);
 
 	char* fSource = new char[size + 1];
-	fread(fSource, sizeof(unsigned char), size, fRaw);
+	if((long)fread(fSource, sizeof(unsigned char), size, fRaw) > size)
+		printf("Insufficient read!\n");
 	fSource[size] = '\0';
 
 	fclose(fRaw);
