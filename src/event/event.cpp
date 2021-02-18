@@ -23,7 +23,7 @@ void MoveWordLeft(int& cursorX, int& cursorY, std::vector<std::string>& contentR
 			return;
 		}
 
-		if(i == -1)
+		if(i < 0)
 		{
 			if(cursorY > 0)
 			{
@@ -56,7 +56,7 @@ void MoveWordRight(int& cursorX, int& cursorY, std::vector<std::string>& content
 			return;
 		}
 
-		if(i == (int)current.size())
+		if(i >= (int)current.size())
 		{
 			if(cursorY < editableRows - 1)
 			{
