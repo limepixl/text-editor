@@ -102,6 +102,10 @@ int main()
 
 	SDL_StartTextInput();
 
+	// Scrolling
+	float scroll = 0.0f;
+	float scrollSensitivity = 20.0f;
+
 	// Render loop
 	while(true)
 	{
@@ -141,6 +145,14 @@ int main()
 					// Update content vector
 					contentRows.resize(numRows);
 				}
+			}
+			else if(e.type == SDL_MOUSEWHEEL)
+			{
+				// Scrolling down is positive, scrolling up is negative
+				scroll -= scrollSensitivity * e.wheel.y;
+
+				// Shouldn't scroll above first line
+				scroll = std::max(scroll, 0.0f);
 			}
 			else if(e.type == SDL_KEYDOWN)
 			{
@@ -295,7 +307,6 @@ int main()
 
 		// Update buffer contents
 		int vertexCount = (int)vertices.size() / 3;
-
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, (int)vertices.size() * sizeof(float), vertices.data());
@@ -310,11 +321,15 @@ int main()
 		if(vertexCount > 0)
 			glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
+		projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight + scroll, 0.0f + scroll);
+		glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
+
 		// Update cursor's model matrix
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, glm::vec3(cursorX * fontWidth, cursorY * fontHeight, 0.0f));
 		glUseProgram(cursorShader.ID);
 		glUniformMatrix4fv(cursorShader.uniforms["model"], 1, GL_FALSE, &model[0][0]);
+		glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 
 		glBindVertexArray(cursorVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
