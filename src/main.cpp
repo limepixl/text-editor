@@ -33,7 +33,7 @@ int main()
 	std::vector<std::string> contentRows;
 
 	int actualRows, actualColls;
-	ParseText("res/textfiles/test1.txt", contentRows, actualRows, actualColls);
+	ParseText("res/textfiles/stb_image.h", contentRows, actualRows, actualColls);
 	int editableRows = (int)contentRows.size();
 
 	std::vector<float> uvs, vertices;
@@ -408,7 +408,7 @@ int main()
 		}
 		end = SDL_GetPerformanceCounter();
 		elapsed = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
-		//printf("FPS: %.2f\n", 1000.0 / elapsed);
+		printf("FPS: %.2f\n", 1000.0 / elapsed);
 	}
 
 	// Cleanup
