@@ -327,7 +327,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		int startRow = (int)(scroll / fontHeight);
-		for(int i = startRow; i < numRows + startRow + 1; i++)
+		for(int i = std::max(startRow - 1, 0); i < numRows + startRow + 1; i++)
 		{
 			int jmax = std::min((int)contentRows[i].size(), numColls);
 			for(int j = 0; j < jmax; j++)
