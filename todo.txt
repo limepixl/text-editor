@@ -1,6 +1,13 @@
+- Windows line endings don't work properly
+- Resizing should work (lol)
+- Ctrl moving through all spaces
+- Ctrl + Backspace should just remove the word until the space
+- Scroll should scroll 1 line according to font size
+- Save changes to file
+- Blinking cursor
+- Cursor scrolls screen if going above or below it
 - A sort of cache, so that unchanging text doesn't re-render each frame
 - Text highlighting
-- Actually load the whole file in memory and don't just load a fixed number of rows
 - Word wrapping
 - Scroll bar
 - Multiple cursors (long goal)
