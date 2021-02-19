@@ -123,7 +123,14 @@ void DeleteWordLeft(int& cursorX, int cursorY, std::vector<std::string>& content
 
 	// Go to beginning of current word
 	if(current[cursorX] != ' ')
-		cursorX = std::max(0, find_last(current, ' ', cursorX));
+	{
+		// Remove all whitespace
+		if(cursorX >= 1 && current[cursorX-1] == ' ')
+			cursorX = std::max(0, find_last_not(current, ' ', cursorX - 1));
+		// Remove up until whitespace
+		else
+			cursorX = std::max(0, find_last(current, ' ', cursorX));
+	}
 	// Go in front of previous word
 	else if(current[cursorX] == ' ' && current[cursorX - 1] != ' ')
 		cursorX = std::max(0, find_last(current, ' ', cursorX - 1));
@@ -144,7 +151,14 @@ void DeleteWordRight(int cursorX, int cursorY, std::vector<std::string>& content
 
 	// Go to end of current word
 	if(current[cursorX] != ' ')
-		cursorX = std::min(size, find_first(current, ' ', cursorX));
+	{
+		// Remove all whitespace
+		if(cursorX < size - 1 && current[cursorX + 1] == ' ')
+			cursorX = std::min(size, find_first_not(current, ' ', cursorX + 1));
+		// Remove up until whitespace
+		else
+			cursorX = std::min(size, find_first(current, ' ', cursorX));
+	}
 	// Go to end of next word
 	else if(current[cursorX] == ' ' && current[cursorX + 1] != ' ')
 		cursorX = std::min(size, find_first(current, ' ', cursorX + 1));
@@ -153,7 +167,7 @@ void DeleteWordRight(int cursorX, int cursorY, std::vector<std::string>& content
 		cursorX = std::min(size, find_first_not(current, ' ', cursorX));
 
 	if(cursorX - lastCursorX != 0)
-		current.erase(current.begin() + lastCursorX, current.begin() + cursorX);
+		current.erase(current.begin() + lastCursorX, current.begin() + cursorX + 1);
 }
 
 void IncrementX(int& cursorX, int& cursorY, int& lastCursorX, int numColls, std::vector<std::string>& contentRows)
