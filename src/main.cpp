@@ -255,7 +255,7 @@ int main()
 				{
 					if(ctrlDown)
 					{
-						MoveWordRight(cursorX, cursorY, contentRows, editableRows);
+						MoveWordRight(cursorX, cursorY, contentRows);
 						lastCursorX = cursorX;
 					}
 					else

@@ -19,70 +19,101 @@ void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& curso
 	IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
 }
 
+// Returns the index of the first position
+// of character c in string str.
+inline int find_first(std::string& str, char c, int from)
+{
+	int sz = (int)str.size();
+	if(from > sz || from < 0)
+		return sz;
+	
+	for(int i = from; i < sz; i++)
+	{
+		if(str[i] == c)
+			return i;
+	}
+
+	return sz;
+}
+
+// Returns the index of the last position 
+// of character c in string str.
+inline int find_last(std::string& str, char c, int from)
+{
+	if(from > (int)str.size() || from < 0)
+		return -1;
+
+	for(int i = from; i >= 0; i--)
+	{
+		if(str[i] == c)
+			return i;
+	}
+
+	return -1;
+}
+
+// Returns the index of the first position
+// of a character not equal to c in string str.
+inline int find_first_not(std::string& str, char c, int from)
+{
+	int sz = (int)str.size();
+	if(from > sz || from < 0)
+		return sz;
+
+	for(int i = from; i < sz; i++)
+	{
+		if(str[i] != c)
+			return i-1;
+	}
+
+	return sz;
+}
+
+// Returns the index of the last position
+// of a character not equal to c in string str.
+inline int find_last_not(std::string& str, char c, int from)
+{
+	if(from > (int)str.size() || from < 0)
+		return -1;
+
+	for(int i = from; i >= 0; i--)
+	{
+		if(str[i] != c)
+			return i+1;
+	}
+
+	return -1;
+}
+
 void MoveWordLeft(int& cursorX, int& cursorY, std::vector<std::string>& contentRows)
 {
 	std::string current = contentRows[cursorY];
 
-	for(int i = cursorX - 1; i >= -1; i--)
-	{
-		if(i == 0)
-		{
-			cursorX = 0;
-			return;
-		}
-
-		if(i < 0)
-		{
-			if(cursorY > 0)
-			{
-				current = contentRows[--cursorY];
-				cursorX = (int)current.length();
-				return;
-			}
-			
-			cursorX = 0;
-			return;
-		}
-
-		if(current[i] == ' ')
-		{
-			cursorX = i;
-			return;
-		}
-	}
+	// Go to beginning of current word
+	if(current[cursorX] != ' ')
+		cursorX = std::max(0, find_last(current, ' ', cursorX));
+	// Go in front of previous word
+	else if(current[cursorX] == ' ' && current[cursorX - 1] != ' ')
+		cursorX = std::max(0, find_last(current, ' ', cursorX - 1));
+	// skip all spaces and go after previous word
+	else
+		cursorX = std::max(0, find_last_not(current, ' ', cursorX - 1));
 }
 
-void MoveWordRight(int& cursorX, int& cursorY, std::vector<std::string>& contentRows, int editableRows)
+void MoveWordRight(int& cursorX, int& cursorY, std::vector<std::string>& contentRows)
 {
 	std::string current = contentRows[cursorY];
+	int size = (int)current.size();
 
-	for(int i = cursorX + 1; i <= (int)current.size() + 1; i++)
-	{
-		if(i == (int)current.size() - 1)
-		{
-			cursorX = (int)current.size();
-			return;
-		}
-
-		if(i >= (int)current.size())
-		{
-			if(cursorY < editableRows - 1)
-			{
-				current = contentRows[++cursorY];
-				cursorX = 0;
-				return;
-			}
-
-			cursorX = (int)current.size();
-			return;
-		}
-
-		if(current[i] == ' ')
-		{
-			cursorX = i;
-			return;
-		}
-	}
+	// Go to end of current word
+	if(current[cursorX] != ' ')
+		cursorX = std::min(size, find_first(current, ' ', cursorX));
+	// Go to end of next word
+	else if(current[cursorX] == ' ' && current[cursorX + 1] != ' ')
+		cursorX = std::min(size, find_first(current, ' ', cursorX + 1));
+	// skip all spaces and go before next word
+	else
+		cursorX = std::min(size, find_first_not(current, ' ', cursorX + 1));
 }
 
 void DeleteWordLeft(int& cursorX, int cursorY, std::vector<std::string>& contentRows)
