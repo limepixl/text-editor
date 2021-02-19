@@ -293,9 +293,7 @@ int main()
 					if((int)contentRows[cursorY].size() > 0 && cursorX < (int)contentRows[cursorY].size())
 					{
 						if(ctrlDown)
-						{
 							DeleteWordRight(cursorX, cursorY, contentRows);
-						}
 						else
 							contentRows[cursorY].erase(contentRows[cursorY].begin() + cursorX);
 					}
