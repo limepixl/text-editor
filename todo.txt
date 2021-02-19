@@ -1,4 +1,3 @@
-- Windows line endings don't work properly
 - Resizing should work (lol)
 - Ctrl moving through all spaces
 - Ctrl + Backspace should just remove the word until the space

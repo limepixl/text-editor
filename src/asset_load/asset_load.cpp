@@ -258,8 +258,12 @@ void ParseText(const char* path, std::vector<std::string>& contentRows, int& num
 		if(numColls < length)
 			numColls = length;
 
-		if(line[length - 1] == '\r' || line[length - 1] == '\n')
-			line[--length] = '\0';
+		if(line[length - 2] == '\r')
+			length -= 2;
+		else if(line[length - 1] == '\n')
+			length--;
+
+		line[length] = '\0';
 
 		std::string tmp(line);
 		auto l = tmp.find('\0');
