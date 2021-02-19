@@ -97,7 +97,7 @@ void MoveWordLeft(int& cursorX, int& cursorY, std::vector<std::string>& contentR
 		cursorX = std::max(0, find_last(current, ' ', cursorX - 1));
 	// skip all spaces and go after previous word
 	else
-		cursorX = std::max(0, find_last_not(current, ' ', cursorX - 1));
+		cursorX = std::max(0, find_last_not(current, ' ', cursorX));
 }
 
 void MoveWordRight(int& cursorX, int& cursorY, std::vector<std::string>& contentRows)
@@ -113,49 +113,47 @@ void MoveWordRight(int& cursorX, int& cursorY, std::vector<std::string>& content
 		cursorX = std::min(size, find_first(current, ' ', cursorX + 1));
 	// skip all spaces and go before next word
 	else
-		cursorX = std::min(size, find_first_not(current, ' ', cursorX + 1));
+		cursorX = std::min(size, find_first_not(current, ' ', cursorX));
 }
 
 void DeleteWordLeft(int& cursorX, int cursorY, std::vector<std::string>& contentRows)
 {
-	std::string& currentLine = contentRows[cursorY];
+	std::string& current = contentRows[cursorY];
+	int lastCursorX = cursorX;
 
-	for(int i = cursorX - 1; i >= 0; i--)
-	{
-		if(i <= 0)
-		{
-			currentLine.erase(currentLine.begin(), currentLine.begin() + cursorX);
-			cursorX = 0;
-			return;
-		}
+	// Go to beginning of current word
+	if(current[cursorX] != ' ')
+		cursorX = std::max(0, find_last(current, ' ', cursorX));
+	// Go in front of previous word
+	else if(current[cursorX] == ' ' && current[cursorX - 1] != ' ')
+		cursorX = std::max(0, find_last(current, ' ', cursorX - 1));
+	// skip all spaces and go after previous word
+	else
+		cursorX = std::max(0, find_last_not(current, ' ', cursorX));
 
-		if(currentLine[i] == ' ')
-		{
-			currentLine.erase(currentLine.begin() + i, currentLine.begin() + cursorX);
-			cursorX = i;
-			return;
-		}
-	}
+	if(lastCursorX - cursorX != 0)
+		current.erase(current.begin() + cursorX, current.begin() + lastCursorX);
 }
 
 void DeleteWordRight(int cursorX, int cursorY, std::vector<std::string>& contentRows)
 {
-	std::string& currentLine = contentRows[cursorY];
+	std::string& current = contentRows[cursorY];
+	int size = (int)current.size();
 
-	for(int i = cursorX + 1; i <= (int)currentLine.size() + 1; i++)
-	{
-		if(i == (int)currentLine.size())
-		{
-			currentLine.erase(currentLine.begin() + cursorX, currentLine.end());
-			return;
-		}
+	int lastCursorX = cursorX;
 
-		if(currentLine[i] == ' ')
-		{
-			currentLine.erase(currentLine.begin() + cursorX, currentLine.begin() + i);
-			return;
-		}
-	}
+	// Go to end of current word
+	if(current[cursorX] != ' ')
+		cursorX = std::min(size, find_first(current, ' ', cursorX));
+	// Go to end of next word
+	else if(current[cursorX] == ' ' && current[cursorX + 1] != ' ')
+		cursorX = std::min(size, find_first(current, ' ', cursorX + 1));
+	// skip all spaces and go before next word
+	else
+		cursorX = std::min(size, find_first_not(current, ' ', cursorX));
+
+	if(cursorX - lastCursorX != 0)
+		current.erase(current.begin() + lastCursorX, current.begin() + cursorX);
 }
 
 void IncrementX(int& cursorX, int& cursorY, int& lastCursorX, int numColls, std::vector<std::string>& contentRows)
