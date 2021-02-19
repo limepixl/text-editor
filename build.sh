@@ -1,4 +1,4 @@
-cppflags='-g3 -Wall -Wextra'
+cppflags='-O2 -Wall -Wextra'
 
 if [ ! -f glad.o ]; then
     gcc $cppflags -c thirdparty/glad/src/glad.c -I thirdparty/glad/include
