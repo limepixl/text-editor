@@ -32,8 +32,8 @@ int main()
 	int numColls = windowWidth / fontWidth;
 	std::vector<std::string> contentRows;
 
-	// TODO: add change of buffer size when exceeding max numrows and collumns
-	ParseText("res/textfiles/stb_image.h", contentRows, numRows, numColls);
+	int actualRows, actualColls;
+	ParseText("res/textfiles/stb_image.h", contentRows, actualRows, actualColls);
 	int editableRows = (int)contentRows.size();
 
 	std::vector<float> uvs, vertices;
@@ -188,6 +188,7 @@ int main()
 
 				// Shouldn't scroll above first line
 				scroll = std::max(scroll, 0.0f);
+				printf("Scroll: %f\n", scroll);
 			}
 			else if(e.type == SDL_MOUSEBUTTONDOWN)
 			{
@@ -325,7 +326,8 @@ int main()
 		
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		for(int i = 0; i < editableRows; i++)
+		int startRow = (int)(scroll / fontHeight);
+		for(int i = startRow; i < numRows + startRow + 1; i++)
 		{
 			int jmax = std::min((int)contentRows[i].size(), numColls);
 			for(int j = 0; j < jmax; j++)
@@ -406,7 +408,7 @@ int main()
 		}
 		end = SDL_GetPerformanceCounter();
 		elapsed = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
-		//printf("FPS: %.2f\n", 1000.0 / elapsed);
+		printf("FPS: %.2f\n", 1000.0 / elapsed);
 	}
 
 	// Cleanup
