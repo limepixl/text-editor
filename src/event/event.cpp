@@ -167,7 +167,7 @@ void DeleteWordRight(int cursorX, int cursorY, std::vector<std::string>& content
 		cursorX = std::min(size, find_first_not(current, ' ', cursorX));
 
 	if(cursorX - lastCursorX != 0)
-		current.erase(current.begin() + lastCursorX, current.begin() + cursorX + 1);
+		current.erase(current.begin() + lastCursorX, current.begin() + cursorX);
 }
 
 void IncrementX(int& cursorX, int& cursorY, int& lastCursorX, int numColls, std::vector<std::string>& contentRows)
