@@ -3,6 +3,11 @@
 #include <cstring>
 #include <inttypes.h>
 
+#include <glad/glad.h>
+#include <ft2build.h>
+#include <freetype/freetype.h>
+#include FT_FREETYPE_H
+
 struct BlockType1
 {
 	int16_t fontSize;
@@ -278,4 +283,60 @@ void ParseText(const char* path, std::vector<std::string>& contentRows, int& num
 		numRows = numLinesProcessed;
 
 	fclose(textfile);
+}
+
+std::vector<FTChar> ParseFontFT(const char* path, int pointSize)
+{
+	FT_Library library;
+
+	if(FT_Init_FreeType(&library))
+		printf("Could not init FreeType!\n");
+
+	FT_Face face;
+	int error = FT_New_Face(library, path, 0, &face);
+	if(error == FT_Err_Unknown_File_Format)
+		printf("The font file was read successfully but the format of the file is unsupported!\n");
+	else if(error)
+		printf("The font file was not read! Could be broken!\n");
+
+	if(FT_Set_Char_Size(face, 64 * pointSize, 0, 72, 72))
+		printf("Unsupported fixed font size!\n");
+	
+	std::vector<FTChar> loadedCharacters;
+	loadedCharacters.reserve(128);
+
+	// Disable 4byte alignment
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	for(unsigned char c = 0; c < 128; c++)
+	{
+		int glyphIndex = FT_Get_Char_Index(face, c);
+		if(FT_Load_Glyph(face, glyphIndex, FT_LOAD_DEFAULT))
+			printf("Failed to load glyph with index: %d\n", glyphIndex);
+
+		if(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
+			printf("Failed to render glyph with index: %d\n", glyphIndex);
+
+		Texture tmp
+		(
+			face->glyph->bitmap.buffer, 
+			face->glyph->bitmap.width,
+			face->glyph->bitmap.rows,
+			1
+		);
+
+		FTChar tmpChar = 
+		{
+        	tmp.ID, 
+			tmp.index,
+        	glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+        	glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+        	face->glyph->advance.x
+    	};
+		loadedCharacters.push_back(tmpChar);
+	}
+
+	FT_Done_Face(face);
+	FT_Done_FreeType(library);
+
+	return loadedCharacters;
 }

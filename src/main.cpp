@@ -15,17 +15,23 @@ int main()
 {
 	SDL_SetMainReady();
 
-	// Parse the FNT file to get info for each character
-	std::vector<Char> chars = ParseFNT("res/font/roboto-mono.fnt");
-
-	// Scale down / up font size
-	float scale = 0.5f;
-	float fontWidth = chars[0].charWidth * scale;
-	float fontHeight = chars[0].charHeight * scale;
-
 	int windowWidth = 1280;
 	int windowHeight = 720;
 	Display display("Text Editor", windowWidth, windowHeight);
+
+	// Parse font from ttf file
+	int pointSize = 100;
+	std::vector<FTChar> loadedCharacters = ParseFontFT("res/font/Hack-ttf/Hack-Regular.ttf", pointSize);
+
+	float fontWidth = 0.0f;
+	float fontHeight = 0.0f;
+	for(auto& f : loadedCharacters)
+	{
+		if(fontWidth < f.size.x)
+			fontWidth = f.size.x;
+		if(fontHeight < f.size.y)
+			fontHeight = f.size.y;
+	}
 
 	// Editor layout
 	int numRows = windowHeight / fontHeight;
@@ -109,20 +115,17 @@ int main()
 	glGenBuffers(2, VBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 18 * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 12 * sizeof(float), uvs.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
-	Texture atlas = LoadTextureFromBinary("res/font/roboto-mono.bin");
-
-	Shader shader = LoadShaderFromFile("res/shader/basic.vert", "res/shader/basic.frag");
+	Shader shader = LoadShaderFromFile("res/shader/glyph.vert", "res/shader/glyph.frag");
 	glUseProgram(shader.ID);
-	glUniform1i(shader.uniforms["tex"], atlas.index);
 
 	glm::mat4 projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f);
 	glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
@@ -351,49 +354,59 @@ int main()
 		startRow = (int)(scroll / fontHeight);
 		endRow = std::min(numRows + startRow + 1, editableRows);
 
+		// Use editor shader and bind editor VAO
+		glBindVertexArray(VAO);
+		glUseProgram(shader.ID);
+		int loc = shader.uniforms["tex"];
+
 		for(int i = std::max(startRow - 1, 0); i < endRow; i++)
 		{
 			int jmax = std::min((int)contentRows[i].size(), numColls);
+			std::string& currentRow = contentRows[i];
+
+			float y = i * fontHeight;
+
 			for(int j = 0; j < jmax; j++)
 			{
-				Char& currentChar = chars[contentRows[i][j] - ' '];
-				uvs.insert(uvs.end(), currentChar.uvs.begin(), currentChar.uvs.end());
+				float x = j * fontWidth;
 
-				float startx = j * fontWidth;
-				float starty = i * fontHeight;
-				float endx = (j + 1) * fontWidth;
-				float endy = (i + 1) * fontHeight;
+				FTChar& currentChar = loadedCharacters[currentRow[j]];
+				glUniform1i(loc, currentChar.textureIndex);
 
-				std::vector<float> tempVec
+				float startx = x + currentChar.bearing.x;
+				float starty = y + fontHeight - currentChar.bearing.y;
+				float endx = x + currentChar.size.x + currentChar.bearing.x;
+				float endy = starty + currentChar.size.y;
+
+				float tempVerts[]
 				{
-					startx, starty, 0.0f, 
-					endx, starty, 0.0f,
-					endx, endy, 0.0f,
-					endx, endy, 0.0f, 
-					startx, endy, 0.0f,
-					startx, starty, 0.0f
+					startx, starty,
+					endx, starty,
+					endx, endy,
+					endx, endy,
+					startx, endy,
+					startx, starty,
 				};
-				vertices.insert(vertices.end(), tempVec.begin(), tempVec.end());
+
+				float tempUVs[]
+				{
+					0.0f, 0.0f,
+					1.0f, 0.0f,
+					1.0f, 1.0f,
+					1.0f, 1.0f,
+					0.0f, 1.0f,
+					0.0f, 0.0f
+				};
+
+				glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tempVerts), tempVerts);
+
+				glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tempUVs), tempUVs);
+
+				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
 		}
-
-		glUseProgram(shader.ID);
-
-		// Update buffer contents
-		int vertexCount = (int)vertices.size() / 3;
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, (int)vertices.size() * sizeof(float), vertices.data());
-		if(!vertices.empty())
-			vertices.clear();
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, (int)uvs.size() * sizeof(float), uvs.data());
-		if(!uvs.empty())
-			uvs.clear();
-
-		if(vertexCount > 0)
-			glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
 		projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight + scroll, 0.0f + scroll);
 		glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);

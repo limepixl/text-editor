@@ -5,7 +5,9 @@
             "includePath": [
                 "${workspaceFolder}/*",
                 "${workspaceFolder}/thirdparty/glad/include",
-                "${workspaceFolder}/thirdparty/stb_image"
+                "${workspaceFolder}/thirdparty/stb_image",
+                "${workspaceFolder}/thirdparty/freetype/include",
+                "${workspaceFolder}/thirdparty/glm"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

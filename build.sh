@@ -5,8 +5,8 @@ if [ ! -f glad.o ]; then
 fi
 
 conf=$(sdl2-config --cflags --libs)
-tp_includes='-I thirdparty/glad/include -I thirdparty/glm'
-tp_libs='-ldl'
+tp_includes='-I thirdparty/glad/include -I thirdparty/glm -I thirdparty/freetype/include'
+tp_libs='-ldl -lfreetype'
 source='src/*.cpp src/window/*.cpp src/shader/*.cpp src/texture/*.cpp src/asset_load/*.cpp src/event/*.cpp'
 
 g++ $cppflags $source glad.o -o editor $conf $tp_includes $tp_libs
