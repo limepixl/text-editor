@@ -104,7 +104,7 @@ std::vector<Char> ParseFNT(const char* path)
 
 		if(typeIdentifier == 1)
 		{
-			memcpy(&block1, buffer + byteIndex, 14);
+			memcpy((void*)&block1, buffer + byteIndex, 14);
 
 			size_t strsize = strlen((const char*)(buffer + (byteIndex += 14)));
 			block1.stringPtr = new char[strsize + 1];
