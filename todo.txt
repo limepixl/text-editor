@@ -3,6 +3,7 @@
 - Scroll should scroll 1 line according to font size
 - Save changes to file
 - Blinking cursor
+- Copy / paste
 - Cursor scrolls screen if going above or below it
 - A sort of cache, so that unchanging text doesn't re-render each frame
 - Text highlighting

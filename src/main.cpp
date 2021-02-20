@@ -139,7 +139,12 @@ int main()
 
 	// Scrolling
 	float scroll = 0.0f;
-	float scrollSensitivity = 50.0f;
+	float scrollSensitivity = fontHeight;
+	bool shouldConstrict = false;
+
+	// Which rows to render after scrolling
+	int startRow = (int)(scroll / fontHeight);
+	int endRow = std::min(numRows + startRow + 1, editableRows);
 
 	// Render loop
 	while(true)
@@ -223,6 +228,8 @@ int main()
 						}
 
 						lastCursorX = cursorX;
+
+						shouldConstrict = true;
 					}
 					else if(cursorX == 0 && cursorY > 0) // There isn't a character in the line, so go to the previous line
 					{
@@ -247,6 +254,8 @@ int main()
 					}
 					else
 						DecrementX(cursorX, lastCursorX);
+
+					shouldConstrict = true;
 				}
 				else if(code == SDLK_RIGHT)
 				{
@@ -263,11 +272,19 @@ int main()
 					}
 					else
 						IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
+
+					shouldConstrict = true;
 				}
 				else if(code == SDLK_UP)
+				{
 					DecrementY(cursorX, cursorY, lastCursorX, contentRows);
+					shouldConstrict = true;
+				}
 				else if(code == SDLK_DOWN)
+				{
 					IncrementY(cursorX, cursorY, lastCursorX, contentRows, editableRows);
+					shouldConstrict = true;
+				}
 				else if(code == SDLK_RETURN)
 				{
 					std::string leftover(contentRows[cursorY].begin() + cursorX, contentRows[cursorY].end());
@@ -286,6 +303,8 @@ int main()
 					lastCursorX = 0;
 					cursorY++;
 					editableRows++;
+
+					shouldConstrict = true;
 				}
 				else if(code == SDLK_DELETE)
 				{
@@ -303,6 +322,8 @@ int main()
 						contentRows.erase(contentRows.begin() + cursorY + 1);
 						editableRows--;
 					}
+
+					shouldConstrict = true;
 				}
 				else if(code == SDLK_HOME)
 					cursorX = 0;
@@ -317,8 +338,19 @@ int main()
 		
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		int startRow = (int)(scroll / fontHeight);
-		int endRow = std::min(numRows + startRow + 1, editableRows);
+		if(shouldConstrict)
+		{
+			if(cursorY >= endRow)
+				scroll += (cursorY - endRow + 1) * scrollSensitivity;
+			else if(cursorY < startRow)
+				scroll -= (startRow - cursorY) * scrollSensitivity;
+
+			shouldConstrict = false;
+		}
+
+		startRow = (int)(scroll / fontHeight);
+		endRow = std::min(numRows + startRow + 1, editableRows);
+
 		for(int i = std::max(startRow - 1, 0); i < endRow; i++)
 		{
 			int jmax = std::min((int)contentRows[i].size(), numColls);
