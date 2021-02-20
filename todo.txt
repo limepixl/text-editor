@@ -1,7 +1,6 @@
 - Resizing should work (lol)
-- Ctrl + Backspace should just remove the word until the space
-- Scroll should scroll 1 line according to font size
 - Save changes to file
+- Render font regardless of size (different images?)
 - Blinking cursor
 - Copy / paste
 - Cursor scrolls screen if going above or below it
