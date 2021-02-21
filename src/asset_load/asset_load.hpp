@@ -7,11 +7,10 @@
 
 struct FTChar
 {
-    uint32_t textureID;
-    uint32_t textureIndex;
     glm::ivec2 size;
     glm::ivec2 bearing;
-    int64_t advance;
+    int64_t advanceX;
+    float tx; // x offset in uvs
 };
 
 struct Char
@@ -27,4 +26,4 @@ Texture LoadTextureFromBinary(const char* path);
 Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath);
 void ParseText(const char* path, std::vector<std::string>& contentRows, int& numRows, int& numColls);
 
-std::vector<FTChar> ParseFontFT(const char* path, int pointSize);
+Texture ParseFontFT(const char* path, int pointSize, std::vector<FTChar>& loadedCharacters);

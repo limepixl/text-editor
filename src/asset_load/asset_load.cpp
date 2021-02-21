@@ -285,7 +285,7 @@ void ParseText(const char* path, std::vector<std::string>& contentRows, int& num
 	fclose(textfile);
 }
 
-std::vector<FTChar> ParseFontFT(const char* path, int pointSize)
+Texture ParseFontFT(const char* path, int pointSize, std::vector<FTChar>& loadedCharacters)
 {
 	FT_Library library;
 
@@ -299,44 +299,51 @@ std::vector<FTChar> ParseFontFT(const char* path, int pointSize)
 	else if(error)
 		printf("The font file was not read! Could be broken!\n");
 
-	if(FT_Set_Char_Size(face, 64 * pointSize, 0, 72, 72))
+	if(FT_Set_Char_Size(face, 64 * pointSize, 0, 96, 96))
 		printf("Unsupported fixed font size!\n");
 	
-	std::vector<FTChar> loadedCharacters;
 	loadedCharacters.reserve(128);
 
-	// Disable 4byte alignment
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	// Get max width and height
+	int w = 0, h = 0;
 	for(unsigned char c = 0; c < 128; c++)
 	{
-		int glyphIndex = FT_Get_Char_Index(face, c);
-		if(FT_Load_Glyph(face, glyphIndex, FT_LOAD_DEFAULT))
-			printf("Failed to load glyph with index: %d\n", glyphIndex);
+		if(FT_Load_Char(face, c, FT_LOAD_RENDER))
+			printf("Failed to load char: %c\n", c);
 
-		if(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
-			printf("Failed to render glyph with index: %d\n", glyphIndex);
+		w += face->glyph->bitmap.width;
+		h = std::max((unsigned int)h, face->glyph->bitmap.rows);
+	}
 
-		Texture tmp
-		(
-			face->glyph->bitmap.buffer, 
-			face->glyph->bitmap.width,
-			face->glyph->bitmap.rows,
-			1
-		);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		FTChar tmpChar = 
+	Texture atlas(NULL, w, h, 1);
+	glActiveTexture(GL_TEXTURE0 + atlas.index);
+	glBindTexture(GL_TEXTURE_2D, atlas.ID);
+
+	int x = 0;
+	for(unsigned char c = 0; c < 128; c++)
+	{
+		if(FT_Load_Char(face, c, FT_LOAD_RENDER))
+			printf("Failed to load char: %c\n", c);
+
+		auto* g = face->glyph;
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x, 0, g->bitmap.width, g->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
+
+		FTChar tmpChar
 		{
-        	tmp.ID, 
-			tmp.index,
-        	glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-        	glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-        	face->glyph->advance.x
-    	};
+			glm::ivec2(g->bitmap.width, g->bitmap.rows),
+			glm::ivec2(g->bitmap_left, g->bitmap_top),
+			g->advance.x >> 6,
+			(float)x / w
+		};
 		loadedCharacters.push_back(tmpChar);
+
+		x += face->glyph->bitmap.width;
 	}
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
 
-	return loadedCharacters;
+	return atlas;
 }

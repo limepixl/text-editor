@@ -20,8 +20,10 @@ int main()
 	Display display("Text Editor", windowWidth, windowHeight);
 
 	// Parse font from ttf file
-	int pointSize = 100;
-	std::vector<FTChar> loadedCharacters = ParseFontFT("res/font/Hack-ttf/Hack-Regular.ttf", pointSize);
+	int pointSize = 20;
+	std::vector<FTChar> loadedCharacters;
+	Texture atlas = ParseFontFT("res/font/JetBrainsMono/fonts/ttf/JetBrainsMono-Regular.ttf", pointSize, loadedCharacters);
+	FTChar& tChar = loadedCharacters['T'];
 
 	float fontWidth = 0.0f;
 	float fontHeight = 0.0f;
@@ -115,12 +117,12 @@ int main()
 	glGenBuffers(2, VBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 6 * 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 6 * 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
@@ -136,7 +138,7 @@ int main()
 
 	// Used for FPS
 	Uint64 start, end;
-	double targetFPS = 1000.0f / 60.0f /*change this*/;
+	double targetFPS = 1000.0f / 60.0f;
 
 	SDL_StartTextInput();
 
@@ -358,55 +360,70 @@ int main()
 		glBindVertexArray(VAO);
 		glUseProgram(shader.ID);
 		int loc = shader.uniforms["tex"];
+		glUniform1i(loc, atlas.index);
 
 		for(int i = std::max(startRow - 1, 0); i < endRow; i++)
 		{
 			int jmax = std::min((int)contentRows[i].size(), numColls);
 			std::string& currentRow = contentRows[i];
 
-			float y = i * fontHeight;
+			float y = i * fontHeight + pointSize / 5.0f;
 
 			for(int j = 0; j < jmax; j++)
 			{
 				float x = j * fontWidth;
 
 				FTChar& currentChar = loadedCharacters[currentRow[j]];
-				glUniform1i(loc, currentChar.textureIndex);
 
 				float startx = x + currentChar.bearing.x;
-				float starty = y + fontHeight - currentChar.bearing.y;
-				float endx = x + currentChar.size.x + currentChar.bearing.x;
-				float endy = starty + currentChar.size.y;
+				float starty = y + tChar.size.y - currentChar.bearing.y;
+				float width = currentChar.size.x;
+				float height = currentChar.size.y;
 
-				float tempVerts[]
+				std::vector<float> tempVerts
 				{
 					startx, starty,
-					endx, starty,
-					endx, endy,
-					endx, endy,
-					startx, endy,
+					startx + width, starty,
+					startx + width, starty + height,
+					startx + width, starty + height,
+					startx, starty + height,
 					startx, starty,
 				};
 
-				float tempUVs[]
+				float ux = currentChar.tx;
+				float uxend = ux + (float)currentChar.size.x / atlas.width;
+				float uyend = (float)currentChar.size.y / atlas.height;
+				std::vector<float> tempUVs
 				{
-					0.0f, 0.0f,
-					1.0f, 0.0f,
-					1.0f, 1.0f,
-					1.0f, 1.0f,
-					0.0f, 1.0f,
-					0.0f, 0.0f
+					ux, 0.0f,
+					uxend, 0.0f,
+					uxend, uyend,
+					uxend, uyend,
+					ux, uyend,
+					ux, 0.0f
 				};
 
-				glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tempVerts), tempVerts);
-
-				glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tempUVs), tempUVs);
-
-				glDrawArrays(GL_TRIANGLES, 0, 6);
+				vertices.insert(vertices.end(), tempVerts.begin(), tempVerts.end());
+				uvs.insert(uvs.end(), tempUVs.begin(), tempUVs.end());
 			}
 		}
+
+		int vertexCount = (int)vertices.size() / 2;
+
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, uvs.size() * sizeof(float), uvs.data());
+
+		glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+
+		if(!vertices.empty())
+			vertices.clear();
+
+		if(!uvs.empty())
+			uvs.clear();
 
 		projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight + scroll, 0.0f + scroll);
 		glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
@@ -445,7 +462,7 @@ int main()
 		}
 		end = SDL_GetPerformanceCounter();
 		elapsed = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
-		//printf("FPS: %.2f\n", 1000.0 / elapsed);
+		printf("FPS: %.2f\n", 1000.0 / elapsed);
 	}
 
 	// Cleanup
