@@ -20,9 +20,10 @@
             "includePath": [
                 "${workspaceFolder}/*",
                 "${workspaceFolder}/thirdparty/glad/include",
-                "${workspaceFolder}/thirdparty/stb_image",
+                "${workspaceFolder}/thirdparty/stb",
                 "${workspaceFolder}/thirdparty/SDL2/include",
-                "${workspaceFolder}/thirdparty/glm"
+                "${workspaceFolder}/thirdparty/glm",
+                "${workspaceFolder}/thirdparty/freetype/include"
             ],
             "defines": [
                 "_DEBUG",
