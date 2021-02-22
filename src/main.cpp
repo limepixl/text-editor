@@ -458,7 +458,7 @@ int main()
 		if(elapsed < targetFPS)
 		{
 			//printf("Delaying for: %d\n", (Uint32)floor(targetFPS - elapsed));
-			SDL_Delay(16);
+			SDL_Delay((Uint32)floor(targetFPS - elapsed));
 		}
 		end = SDL_GetPerformanceCounter();
 		elapsed = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
