@@ -285,8 +285,11 @@ void ParseText(const char* path, std::vector<std::string>& contentRows, int& num
 	fclose(textfile);
 }
 
-Texture ParseFontFT(const char* path, int pointSize, std::vector<FTChar>& loadedCharacters)
+FontData ParseFontFT(const char* path, int pointSize)
 {
+	FontData result;
+	result.pointSize = pointSize;
+
 	FT_Library library;
 
 	if(FT_Init_FreeType(&library))
@@ -302,7 +305,7 @@ Texture ParseFontFT(const char* path, int pointSize, std::vector<FTChar>& loaded
 	if(FT_Set_Char_Size(face, 64 * pointSize, 0, 96, 96))
 		printf("Unsupported fixed font size!\n");
 	
-	loadedCharacters.reserve(128);
+	result.loadedCharacters.reserve(128);
 
 	// Get max width and height
 	int w = 0, h = 0;
@@ -317,9 +320,9 @@ Texture ParseFontFT(const char* path, int pointSize, std::vector<FTChar>& loaded
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	Texture atlas(NULL, w, h, 1);
-	glActiveTexture(GL_TEXTURE0 + atlas.index);
-	glBindTexture(GL_TEXTURE_2D, atlas.ID);
+	result.fontAtlas = Texture(NULL, w, h, 1);
+	glActiveTexture(GL_TEXTURE0 + result.fontAtlas.index);
+	glBindTexture(GL_TEXTURE_2D, result.fontAtlas.ID);
 
 	int x = 0;
 	for(unsigned char c = 0; c < 128; c++)
@@ -337,7 +340,7 @@ Texture ParseFontFT(const char* path, int pointSize, std::vector<FTChar>& loaded
 			g->advance.x >> 6,
 			(float)x / w
 		};
-		loadedCharacters.push_back(tmpChar);
+		result.loadedCharacters.push_back(tmpChar);
 
 		x += face->glyph->bitmap.width;
 	}
@@ -345,5 +348,5 @@ Texture ParseFontFT(const char* path, int pointSize, std::vector<FTChar>& loaded
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
 
-	return atlas;
+	return result;
 }

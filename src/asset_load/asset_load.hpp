@@ -21,9 +21,16 @@ struct Char
     int charHeight;
 };
 
+struct FontData
+{
+    int pointSize;
+    Texture fontAtlas;
+    std::vector<FTChar> loadedCharacters;
+};
+
 std::vector<Char> ParseFNT(const char* path);
 Texture LoadTextureFromBinary(const char* path);
 Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath);
 void ParseText(const char* path, std::vector<std::string>& contentRows, int& numRows, int& numColls);
 
-Texture ParseFontFT(const char* path, int pointSize, std::vector<FTChar>& loadedCharacters);
+FontData ParseFontFT(const char* path, int pointSize);

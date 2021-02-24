@@ -21,13 +21,12 @@ int main()
 
 	// Parse font from ttf file
 	int pointSize = 20;
-	std::vector<FTChar> loadedCharacters;
-	Texture atlas = ParseFontFT("res/font/Hack-ttf/Hack-Regular.ttf", pointSize, loadedCharacters);
-	FTChar& tChar = loadedCharacters['T'];
+	FontData fontData = ParseFontFT("res/font/Hack-ttf/Hack-Regular.ttf", pointSize);
+	FTChar& tChar = fontData.loadedCharacters['T'];
 
 	float fontWidth = 0.0f;
 	float fontHeight = 0.0f;
-	for(auto& f : loadedCharacters)
+	for(auto& f : fontData.loadedCharacters)
 	{
 		if(fontWidth < f.size.x)
 			fontWidth = f.size.x;
@@ -363,7 +362,7 @@ int main()
 		glBindVertexArray(VAO);
 		glUseProgram(shader.ID);
 		int loc = shader.uniforms["tex"];
-		glUniform1i(loc, atlas.index);
+		glUniform1i(loc, fontData.fontAtlas.index);
 
 		for(int i = std::max(startRow - 1, 0); i < endRow; i++)
 		{
@@ -376,7 +375,7 @@ int main()
 			{
 				float x = j * fontWidth;
 
-				FTChar& currentChar = loadedCharacters[currentRow[j]];
+				FTChar& currentChar = fontData.loadedCharacters[currentRow[j]];
 
 				float startx = x + currentChar.bearing.x;
 				float starty = y + tChar.size.y - currentChar.bearing.y;
@@ -394,8 +393,8 @@ int main()
 				};
 
 				float ux = currentChar.tx;
-				float uxend = ux + (float)currentChar.size.x / atlas.width;
-				float uyend = (float)currentChar.size.y / atlas.height;
+				float uxend = ux + (float)currentChar.size.x / fontData.fontAtlas.width;
+				float uyend = (float)currentChar.size.y / fontData.fontAtlas.height;
 				std::vector<float> tempUVs
 				{
 					ux, 0.0f,
