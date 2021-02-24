@@ -28,9 +28,9 @@ Editor::Editor(Display &display, FontData &fontData)
 	vertices.reserve(numRows * numColls * 12);
 	uvs.reserve(numRows * numColls * 18);
 
-	//editableRows = ParseText("res/textfiles/test1.txt", contentRows, actualRows, actualColls);
-	editableRows = 1;
-	contentRows.resize(editableRows);
+	editableRows = ParseText("res/textfiles/stb_image.h", contentRows, actualRows, actualColls);
+	//editableRows = 1;
+	//contentRows.resize(editableRows);
 
 	// Cursor OpenGL setup
 	float cursorVerts[]
@@ -132,21 +132,38 @@ void Editor::ProcessEvents()
 	{
 		if (e.type == SDL_WINDOWEVENT)
 		{
-			if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+			if (e.window.event == SDL_WINDOWEVENT_RESIZED ||
+			    e.window.event == SDL_WINDOWEVENT_MAXIMIZED)
 			{
-				windowWidth = e.window.data1;
-				windowHeight = e.window.data2;
+				if (e.window.event == SDL_WINDOWEVENT_MAXIMIZED)
+				{
+					int w, h;
+					SDL_GetWindowSize(SDL_GetWindowFromID(e.window.windowID), &w, &h);
+					windowWidth = (uint32_t)w;
+					windowHeight = (uint32_t)h;
+				}
+				else
+				{
+					windowWidth = e.window.data1;
+					windowHeight = e.window.data2;
+				}
 
 				// Update viewport and projection matrix
 				glViewport(0, 0, windowWidth, windowHeight);
-				projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f);
-				glUseProgram(shader.ID);
-				glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
-				glUseProgram(cursorShader.ID);
-				glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
+				projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight + scroll, 0.0f + scroll);
 
 				numRows = windowHeight / fontHeight;
 				numColls = windowWidth / fontWidth;
+
+				// Update VBO sizes
+				glBindVertexArray(VAO);
+				glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+				glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 6 * 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
+
+				glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+				glBufferData(GL_ARRAY_BUFFER, numRows * numColls * 6 * 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
+				
+				glBindVertexArray(0);
 			}
 		}
 		else if(e.type == SDL_QUIT)
@@ -363,8 +380,6 @@ void Editor::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// Use editor shader and bind editor VAO
-	glBindVertexArray(VAO);
 	glUseProgram(shader.ID);
 	int loc = shader.uniforms["tex"];
 	glUniform1i(loc, fontData.fontAtlas.index);

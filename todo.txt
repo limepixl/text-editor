@@ -1,5 +1,3 @@
-- Resizing should work (lol)
-- Save changes to file
 - Blinking cursor
 - Copy / paste
 - A sort of cache, so that unchanging text doesn't re-render each frame
