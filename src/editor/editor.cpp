@@ -306,6 +306,43 @@ void Editor::ProcessEvents()
 				cursorX = 0;
 			else if (code == SDLK_END)
 				cursorX = (int)contentRows[cursorY].size();
+			else if (code == SDLK_s && ctrlDown)
+			{
+				if(!copyBuffer.empty())
+				{
+					int lastPos = contentRows[0].find_last_of(' ') + 1;
+					std::string fileName = std::string(contentRows[0].begin() + lastPos, contentRows[0].end());
+
+					contentRows = copyBuffer;
+					copyBuffer.clear();
+					
+					cursorX = copyX;
+					cursorY = copyY;
+					lastCursorX = cursorX;
+					editableRows = (int)contentRows.size();
+
+					FILE* output = fopen(fileName.c_str(), "wb");
+
+					for(uint32_t i = 0; i < editableRows; i++)
+						fprintf(output, "%s\n", contentRows[i].c_str());
+
+					fclose(output);
+				}
+				else
+				{
+					copyBuffer = contentRows;
+					contentRows.clear();
+					contentRows.push_back("File name: name.txt");
+
+					copyX = cursorX;
+					copyY = cursorY;
+
+					editableRows = 1;
+					cursorX = 0;
+					cursorY = 0;
+					lastCursorX = 0;
+				}
+			}
 		}
 		else if (e.type == SDL_TEXTINPUT)
 			ProcessText(e, contentRows, cursorX, cursorY, lastCursorX, numColls);

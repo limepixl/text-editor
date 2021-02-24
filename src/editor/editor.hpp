@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 #include "../asset_load/asset_load.hpp"
 
-
 struct Editor
 {
 	// Window data
@@ -21,6 +20,8 @@ struct Editor
 	// Editor content
 	std::vector<std::string> contentRows;
 	int32_t startRow, endRow;
+	int copyX = 0, copyY = 0;
+	std::vector<std::string> copyBuffer;
 
 	// Font data
 	FontData fontData;
