@@ -46,16 +46,14 @@ Editor::Editor(Display &display, FontData &fontData)
 	glGenVertexArrays(1, &cursorVAO);
 	glBindVertexArray(cursorVAO);
 
-	cursorVBOs = new GLuint[2];
-	glGenBuffers(2, cursorVBOs);
+	glGenBuffers(1, &cursorVBO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, cursorVBOs[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
 	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), cursorVerts, GL_STATIC_DRAW);
+
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, cursorVBOs[1]);
-	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), cursorVerts, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 
@@ -73,16 +71,14 @@ Editor::Editor(Display &display, FontData &fontData)
 	glGenVertexArrays(1, &highlightVAO);
 	glBindVertexArray(highlightVAO);
 
-	highlightVBOs = new GLuint[2];
-	glGenBuffers(2, highlightVBOs);
+	glGenBuffers(1, &highlightVBO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, highlightVBOs[0]);
-	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), highlightVerts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, highlightVBO);
+	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), highlightVerts, GL_DYNAMIC_DRAW);
+
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, highlightVBOs[1]);
-	glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(float), highlightVerts, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 
@@ -123,8 +119,6 @@ Editor::Editor(Display &display, FontData &fontData)
 Editor::~Editor()
 {
 	delete[] VBOs;
-	delete[] cursorVBOs;
-	delete[] highlightVBOs;
 }
 
 void Editor::ProcessEvents()
@@ -136,31 +130,26 @@ void Editor::ProcessEvents()
 	SDL_Event e;
 	while (SDL_PollEvent(&e))
 	{
-		/*
 		if (e.type == SDL_WINDOWEVENT)
 		{
 			if (e.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
-				display.width = e.window.data1;
-				display.height = e.window.data2;
+				windowWidth = e.window.data1;
+				windowHeight = e.window.data2;
 
 				// Update viewport and projection matrix
-				glViewport(0, 0, display.width, display.height);
-				projection = glm::ortho(0.0f, (float)display.width, (float)display.height, 0.0f);
+				glViewport(0, 0, windowWidth, windowHeight);
+				projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f);
 				glUseProgram(shader.ID);
 				glUniformMatrix4fv(shader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 				glUseProgram(cursorShader.ID);
 				glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 
-				numRows = display.height / fontHeight;
-				numColls = display.width / fontWidth;
-
-				// Update content vector
-				contentRows.resize(numRows);
+				numRows = windowHeight / fontHeight;
+				numColls = windowWidth / fontWidth;
 			}
 		}
-		*/
-		if(e.type == SDL_QUIT)
+		else if(e.type == SDL_QUIT)
 		{
 			SDL_Quit();
 			exit(-1);
@@ -250,7 +239,7 @@ void Editor::ProcessEvents()
 					lastCursorX = cursorX;
 				}
 				else
-					IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
+					IncrementX(cursorX, cursorY, lastCursorX, contentRows);
 
 				shouldConstrict = true;
 			}
@@ -350,7 +339,7 @@ void Editor::ProcessEvents()
 			}
 		}
 		else if (e.type == SDL_TEXTINPUT)
-			ProcessText(e, contentRows, cursorX, cursorY, lastCursorX, numColls);
+			ProcessText(e, contentRows, cursorX, cursorY, lastCursorX);
 	}
 
 	if(shouldConstrict)
@@ -382,7 +371,7 @@ void Editor::Draw()
 
 	for (int i = std::max(startRow - 1, 0); i < endRow; i++)
 	{
-		int jmax = std::min((uint32_t)contentRows[i].size(), numColls);
+		int jmax = std::min((uint32_t)contentRows[i].size(), numColls + 1);
 		std::string &currentRow = contentRows[i];
 
 		float y = i * fontHeight + fontData.pointSize / 5.0f;
@@ -462,8 +451,22 @@ void Editor::Draw()
 	model = glm::translate(model, glm::vec3(0.0f, cursorY * fontHeight, 0.0f));
 	glUniformMatrix4fv(cursorShader.uniforms["model"], 1, GL_FALSE, &model[0][0]);
 
-	// Draw highlight
+	// Update highlight's data
+	float highlightVerts[]
+	{
+		0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f,
+		(float)windowWidth + 0.01f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f,
+		(float)windowWidth + 0.01f, fontHeight, 0.0f, 0.5f, 0.5f, 0.5f,
+		(float)windowWidth + 0.01f, fontHeight, 0.0f, 0.5f, 0.5f, 0.5f,
+		0.0f, fontHeight, 0.0f, 0.5f, 0.5f, 0.5f,
+		0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f,
+	};
+
 	glBindVertexArray(highlightVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, highlightVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(highlightVerts), highlightVerts);
+
+	// Draw highlight
 	glDrawArrays(GL_LINE_STRIP, 0, 6);
 
 	glFinish();

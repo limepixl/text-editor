@@ -34,8 +34,8 @@ struct Editor
 	int lastCursorX = 0;
 
 	// Cursor OpenGL data
-	uint32_t cursorVAO, *cursorVBOs;
-	uint32_t highlightVAO, *highlightVBOs;
+	uint32_t cursorVAO, cursorVBO;
+	uint32_t highlightVAO, highlightVBO;
 
 	// Scroll data
 	float scroll = 0.0f;

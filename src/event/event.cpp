@@ -1,7 +1,7 @@
 #include "event.hpp"
 #include <SDL2/SDL.h>
 
-void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int& lastCursorX, int numColls)
+void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& cursorX, int& cursorY, int& lastCursorX)
 {
 	std::string& current = contentRows[cursorY];
 	const char* text = e.text.text;
@@ -13,10 +13,7 @@ void ProcessText(SDL_Event& e, std::vector<std::string>& contentRows, int& curso
 		current = std::string(current.begin(), current.begin() + cursorX) +
 		          strText + std::string(current.begin() + cursorX, current.end());
 
-	if((int)current.size() > numColls)
-		current.pop_back();
-	
-	IncrementX(cursorX, cursorY, lastCursorX, numColls, contentRows);
+	IncrementX(cursorX, cursorY, lastCursorX, contentRows);
 }
 
 // Returns the index of the first position
@@ -170,12 +167,12 @@ void DeleteWordRight(int cursorX, int cursorY, std::vector<std::string>& content
 		current.erase(current.begin() + lastCursorX, current.begin() + cursorX);
 }
 
-void IncrementX(int& cursorX, int& cursorY, int& lastCursorX, int numColls, std::vector<std::string>& contentRows)
+void IncrementX(int& cursorX, int& cursorY, int& lastCursorX, std::vector<std::string>& contentRows)
 {
 	if(contentRows[cursorY].empty())
 		return;
 
-	if(cursorX < (int)contentRows[cursorY].size() && cursorX < numColls - 1)
+	if(cursorX < (int)contentRows[cursorY].size())
 	{
 		cursorX++;
 		lastCursorX = cursorX;

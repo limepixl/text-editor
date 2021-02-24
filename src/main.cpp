@@ -15,7 +15,7 @@ int main()
 	Display display("Text Editor", windowWidth, windowHeight);
 
 	// Parse font from ttf file
-	int pointSize = 30;
+	int pointSize = 25;
 	FontData fontData = ParseFontFT("res/font/Hack-ttf/Hack-Regular.ttf", pointSize);
 	Editor editor(display, fontData);
 
