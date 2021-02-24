@@ -22,7 +22,7 @@ int main()
 	// Parse font from ttf file
 	int pointSize = 20;
 	std::vector<FTChar> loadedCharacters;
-	Texture atlas = ParseFontFT("res/font/JetBrainsMono/fonts/ttf/JetBrainsMono-Regular.ttf", pointSize, loadedCharacters);
+	Texture atlas = ParseFontFT("res/font/Hack-ttf/Hack-Regular.ttf", pointSize, loadedCharacters);
 	FTChar& tChar = loadedCharacters['T'];
 
 	float fontWidth = 0.0f;
@@ -41,7 +41,7 @@ int main()
 	std::vector<std::string> contentRows;
 
 	int actualRows, actualColls;
-	ParseText("res/textfiles/stb_image.h", contentRows, actualRows, actualColls);
+	ParseText("res/textfiles/test1.txt", contentRows, actualRows, actualColls);
 	int editableRows = (int)contentRows.size();
 
 	std::vector<float> uvs, vertices;
