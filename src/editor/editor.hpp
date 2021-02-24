@@ -44,6 +44,7 @@ struct Editor
 	glm::mat4 projection;
 
 	Editor(struct Display& display, struct FontData& fontData);
+	~Editor();
 
 	void ProcessEvents();
 	void Draw();

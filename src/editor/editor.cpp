@@ -118,6 +118,13 @@ Editor::Editor(Display &display, FontData &fontData)
 	glUniformMatrix4fv(cursorShader.uniforms["projection"], 1, GL_FALSE, &projection[0][0]);
 }
 
+Editor::~Editor()
+{
+	delete[] VBOs;
+	delete[] cursorVBOs;
+	delete[] highlightVBOs;
+}
+
 void Editor::ProcessEvents()
 {
 	int numKeys;
