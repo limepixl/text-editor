@@ -31,6 +31,6 @@ struct FontData
 std::vector<Char> ParseFNT(const char* path);
 Texture LoadTextureFromBinary(const char* path);
 Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath);
-void ParseText(const char* path, std::vector<std::string>& contentRows, int& numRows, int& numColls);
+uint32_t ParseText(const char* path, std::vector<std::string>& contentRows, uint32_t& numRows, uint32_t& numColls);
 
 FontData ParseFontFT(const char* path, int pointSize);

@@ -1,9 +1,7 @@
 - Resizing should work (lol)
 - Save changes to file
-- Render font regardless of size (different images?)
 - Blinking cursor
 - Copy / paste
-- Cursor scrolls screen if going above or below it
 - A sort of cache, so that unchanging text doesn't re-render each frame
 - Text highlighting
 - Word wrapping

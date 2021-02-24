@@ -242,14 +242,14 @@ Shader LoadShaderFromFile(const char* vertexPath, const char* fragmentPath)
 	return result;
 }
 
-void ParseText(const char* path, std::vector<std::string>& contentRows, int& numRows, int& numColls)
+uint32_t ParseText(const char* path, std::vector<std::string>& contentRows, uint32_t& numRows, uint32_t& numColls)
 {
 	FILE* textfile = fopen(path, "r");
 	if(!textfile)
 	{
 		printf("Failed to load textfile at path: %s\n", path);
 		fclose(textfile);
-		return;
+		exit(-1);
 	}
 
 	int numLinesProcessed = 0;
@@ -259,7 +259,7 @@ void ParseText(const char* path, std::vector<std::string>& contentRows, int& num
 	{
 		// Remove trailing newline
 		// TODO: Fix line-wrapping over 80 characters
-		int length = strlen(line);
+		uint32_t length = strlen(line);
 		if(numColls < length)
 			numColls = length;
 
@@ -279,10 +279,12 @@ void ParseText(const char* path, std::vector<std::string>& contentRows, int& num
 		numLinesProcessed++;
 	}
 
-	if(numRows < numLinesProcessed)
+	if(numRows < (uint32_t)numLinesProcessed)
 		numRows = numLinesProcessed;
 
 	fclose(textfile);
+
+	return (int)contentRows.size();
 }
 
 FontData ParseFontFT(const char* path, int pointSize)
