@@ -21,6 +21,7 @@ struct Editor
 	std::vector<std::string> contentRows;
 	int32_t startRow, endRow;
 	int copyX = 0, copyY = 0;
+	float copyScroll = 0.0f;
 	std::vector<std::string> copyBuffer;
 
 	// Font data

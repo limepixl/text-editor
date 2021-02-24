@@ -10,6 +10,7 @@
 Editor::Editor(Display &display, FontData &fontData)
 {
 	this->fontData = fontData;
+	tChar = fontData.loadedCharacters['T'];
 	for (auto &f : fontData.loadedCharacters)
 	{
 		if (fontWidth < f.size.x)
@@ -27,8 +28,9 @@ Editor::Editor(Display &display, FontData &fontData)
 	vertices.reserve(numRows * numColls * 12);
 	uvs.reserve(numRows * numColls * 18);
 
-	editableRows = ParseText("res/textfiles/test1.txt", contentRows, actualRows, actualColls);
-	tChar = fontData.loadedCharacters['T'];
+	//editableRows = ParseText("res/textfiles/test1.txt", contentRows, actualRows, actualColls);
+	editableRows = 1;
+	contentRows.resize(editableRows);
 
 	// Cursor OpenGL setup
 	float cursorVerts[]
@@ -319,6 +321,7 @@ void Editor::ProcessEvents()
 					cursorX = copyX;
 					cursorY = copyY;
 					lastCursorX = cursorX;
+					scroll = copyScroll;
 					editableRows = (int)contentRows.size();
 
 					FILE* output = fopen(fileName.c_str(), "wb");
@@ -336,11 +339,13 @@ void Editor::ProcessEvents()
 
 					copyX = cursorX;
 					copyY = cursorY;
+					copyScroll = scroll;
 
 					editableRows = 1;
 					cursorX = 0;
 					cursorY = 0;
 					lastCursorX = 0;
+					scroll = 0.0f;
 				}
 			}
 		}
