@@ -345,6 +345,9 @@ int main()
 
 		if(shouldConstrict)
 		{
+			startRow = (int)(scroll / fontHeight);
+			endRow = std::min(numRows + startRow + 1, editableRows);
+
 			if(cursorY >= endRow)
 				scroll += (cursorY - endRow + 1) * scrollSensitivity;
 			else if(cursorY < startRow)
@@ -462,7 +465,7 @@ int main()
 		}
 		end = SDL_GetPerformanceCounter();
 		elapsed = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
-		printf("FPS: %.2f\n", 1000.0 / elapsed);
+		//printf("FPS: %.2f\n", 1000.0 / elapsed);
 	}
 
 	// Cleanup
