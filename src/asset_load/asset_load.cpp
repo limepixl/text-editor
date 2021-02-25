@@ -263,7 +263,7 @@ uint32_t ParseText(const char* path, std::vector<std::string>& contentRows, uint
 		if(numColls < length)
 			numColls = length;
 
-		if(line[length - 2] == '\r')
+		if(length >= 2 && line[length - 2] == '\r')
 			length -= 2;
 		else if(line[length - 1] == '\n')
 			length--;
