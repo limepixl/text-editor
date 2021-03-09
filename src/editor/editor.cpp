@@ -14,16 +14,16 @@ Editor::Editor(Display &display, FontData &fontData)
 	for (auto &f : fontData.loadedCharacters)
 	{
 		if (fontWidth < f.size.x)
-			fontWidth = f.size.x;
+			fontWidth = (float)f.size.x;
 		if (fontHeight < f.size.y)
-			fontHeight = f.size.y;
+			fontHeight = (float)f.size.y;
 	}
 
 	windowWidth = display.width;
 	windowHeight = display.height;
 
-	numRows = display.height / fontHeight;
-	numColls = display.width / fontWidth;
+	numRows = (uint32_t)(display.height / fontHeight);
+	numColls = (uint32_t)(display.width / fontWidth);
 
 	vertices.reserve(numRows * numColls * 12);
 	uvs.reserve(numRows * numColls * 18);
@@ -152,8 +152,8 @@ void Editor::ProcessEvents()
 				glViewport(0, 0, windowWidth, windowHeight);
 				projection = glm::ortho(0.0f, (float)windowWidth, (float)windowHeight + scroll, 0.0f + scroll);
 
-				numRows = windowHeight / fontHeight;
-				numColls = windowWidth / fontWidth;
+				numRows = (uint32_t)(windowHeight / fontHeight);
+				numColls = (uint32_t)(windowWidth / fontWidth);
 
 				// Update VBO sizes
 				glBindVertexArray(VAO);
@@ -183,11 +183,11 @@ void Editor::ProcessEvents()
 		{
 			if (e.button.button == SDL_BUTTON_LEFT)
 			{
-				cursorY = (e.button.y + scroll) / fontHeight;
+				cursorY = (int)(float(e.button.y + scroll) / fontHeight);
 				cursorY = std::min(std::max(cursorY, 0), (int)editableRows - 1);
 
 				std::string &newLine = contentRows[cursorY];
-				cursorX = e.button.x / fontWidth;
+				cursorX = (int)(e.button.x / fontWidth);
 				cursorX = std::min(std::max(cursorX, 0), (int)newLine.size());
 				lastCursorX = cursorX;
 			}
@@ -318,7 +318,7 @@ void Editor::ProcessEvents()
 			{
 				if(!copyBuffer.empty())
 				{
-					int lastPos = contentRows[0].find_last_of(' ') + 1;
+					size_t lastPos = contentRows[0].find_last_of(' ') + 1;
 					std::string fileName = std::string(contentRows[0].begin() + lastPos, contentRows[0].end());
 
 					contentRows = copyBuffer;
@@ -328,7 +328,7 @@ void Editor::ProcessEvents()
 					cursorY = copyY;
 					lastCursorX = cursorX;
 					scroll = copyScroll;
-					editableRows = (int)contentRows.size();
+					editableRows = (uint32_t)contentRows.size();
 
 					FILE* output = fopen(fileName.c_str(), "wb");
 
@@ -399,8 +399,8 @@ void Editor::Draw()
 
 			float startx = x + currentChar.bearing.x;
 			float starty = y + tChar.size.y - currentChar.bearing.y;
-			float width = currentChar.size.x;
-			float height = currentChar.size.y;
+			float width = (float)currentChar.size.x;
+			float height = (float)currentChar.size.y;
 
 			std::vector<float> tempVerts
 			{

@@ -3,7 +3,7 @@
 #include "../shader/shader.hpp"
 #include <vector>
 #include <string>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 struct FTChar
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include <inttypes.h>
-#include <glm/glm.hpp>
+#include <glm/mat4x4.hpp>
 #include "../asset_load/asset_load.hpp"
 
 struct Editor

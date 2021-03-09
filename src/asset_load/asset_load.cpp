@@ -116,7 +116,7 @@ std::vector<Char> ParseFNT(const char* path)
 			strncpy(block1.stringPtr, (const char*)(buffer + byteIndex), strsize+1);
 			block1.stringPtr[strsize] = '\0';
 
-			byteIndex += strsize + 1;
+			byteIndex += (long)(strsize + 1);
 		}
 		else if(typeIdentifier == 2)
 		{
@@ -130,17 +130,17 @@ std::vector<Char> ParseFNT(const char* path)
 			
 			for(int i = 0; i < block2.pages; i++)
 			{
-				long strsize = strlen((const char*)(buffer + byteIndex));
+				size_t strsize = strlen((const char*)(buffer + byteIndex));
 				block3.pageNames[i] = new char[strsize + 1];
 				strncpy(block3.pageNames[i], (const char*)(buffer + byteIndex), strsize+1);
-				byteIndex += strsize + 1;
+				byteIndex += (long)(strsize + 1);
 			}
 
 			block3.numStrings = block2.pages;
 		}
 		else if(typeIdentifier == 4)
 		{
-			uint16_t numChars = (size - byteIndex) / 20;
+			uint16_t numChars = uint16_t((size - byteIndex) / 20);
 			BlockType4* block4 = new BlockType4[numChars];
 			for(int i = 0; i < numChars; i++)
 			{
@@ -259,7 +259,7 @@ uint32_t ParseText(const char* path, std::vector<std::string>& contentRows, uint
 	{
 		// Remove trailing newline
 		// TODO: Fix line-wrapping over 80 characters
-		uint32_t length = strlen(line);
+		uint32_t length = (uint32_t)strlen(line);
 		if(numColls < length)
 			numColls = length;
 
