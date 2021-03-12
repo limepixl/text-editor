@@ -8,3 +8,4 @@
 *.pdb
 *.bin
 *.obj
+build/
